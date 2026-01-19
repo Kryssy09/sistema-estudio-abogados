@@ -6,4 +6,4 @@ Proyecto académico para el desarrollo de un sistema de gestión que permita adm
 
 ## Equipo de Trabajo
 - Moreno Medina, Krystel Victoria - U22214055
-- 
+- Espinoza Castillo, Angeles Krysthel - U22209468
