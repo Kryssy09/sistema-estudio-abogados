@@ -64,3 +64,4 @@ Uso de:
 
 Carrera: Ingeniería de Sistemas e Informática
 Universidad Tecnológica del Perú – 2026 (Verano)
+
