@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/base}"
+      th:with="activeMenu='dashboard'">
+
+<head>
+    <title>Dashboard</title>
+</head>
+
+<body>
+    <div layout:fragment="content">
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="mb-0">Dashboard</h3>
+            <div class="text-muted">
+                <i class="fa fa-clock me-1"></i>
+                <span th:text="${#dates.format(#dates.createNow(), 'dd MMM yyyy - HH:mm')}">21 Nov 2024 - 10:30</span>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-xl-3 col-md-6">
+                <div class="card card-dark bg-gradient" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <h6 class="text-white-50 mb-2">Total Expedientes</h6>
+                                <h3 class="text-white mb-0" th:text="${stats.totalExpedientes ?: '0'}">156</h3>
+                            </div>
+                            <div class="ms-3">
+                                <i class="fa fa-folder-open fa-2x text-white-50"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <small class="text-white-50">
+                                <i class="fa fa-arrow-up me-1"></i>
+                                <span th:text="${stats.expedientesGrowth ?: '+12%'}">+12%</span> este mes
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6">
+                <div class="card card-dark bg-gradient" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <h6 class="text-white-50 mb-2">Expedientes Activos</h6>
+                                <h3 class="text-white mb-0" th:text="${stats.expedientesActivos ?: '0'}">89</h3>
+                            </div>
+                            <div class="ms-3">
+                                <i class="fa fa-play-circle fa-2x text-white-50"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <small class="text-white-50">
+                                <i class="fa fa-clock me-1"></i>
+                                <span th:text="${stats.tiempoPromedio ?: '15 días'}">15 días</span> tiempo promedio
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6">
+                <div class="card card-dark bg-gradient" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <h6 class="text-white-50 mb-2">Expedientes Cerrados</h6>
+                                <h3 class="text-white mb-0" th:text="${stats.expedientesCerrados ?: '0'}">67</h3>
+                            </div>
+                            <div class="ms-3">
+                                <i class="fa fa-check-circle fa-2x text-white-50"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <small class="text-white-50">
+                                <i class="fa fa-trophy me-1"></i>
+                                <span th:text="${stats.tasaResolucion ?: '85%'}">85%</span> tasa de resolución
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6">
+                <div class="card card-dark bg-gradient" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <h6 class="text-white-50 mb-2">Usuarios Activos</h6>
+                                <h3 class="text-white mb-0" th:text="${stats.usuariosActivos ?: '0'}">24</h3>
+                            </div>
+                            <div class="ms-3">
+                                <i class="fa fa-users fa-2x text-white-50"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <small class="text-white-50">
+                                <i class="fa fa-user me-1"></i>
+                                <span th:text="${stats.usuariosOnline ?: '8'}">8</span> en línea
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="row g-4 mb-4">
+            <!-- Expedientes por Tipo -->
+            <div class="col-xl-8">
+                <div class="card card-dark">
+                    <div class="card-header">
+                        <h6 class="mb-0">Expedientes por Tipo</h6>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="chartExpedientesTipo" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Distribución por Estado -->
+            <div class="col-xl-4">
+                <div class="card card-dark">
+                    <div class="card-header">
+                        <h6 class="mb-0">Distribución por Estado</h6>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="chartExpedientesEstado" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="row g-4">
+            <!-- Actividad Reciente -->
+            <div class="col-xl-8">
+                <div class="card card-dark">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">Actividad Reciente</h6>
+                        <a href="#" class="btn btn-sm btn-outline-light">Ver todos</a>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush">
+                            <div class="list-group-item bg-dark border-secondary d-flex align-items-center">
+                                <div class="me-3">
+                                    <div class="rounded-circle bg-primary bg-opacity-10 p-2">
+                                        <i class="fa fa-plus text-primary"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="fw-semibold">Nuevo expediente creado</div>
+                                    <small class="text-muted">EXP-2024-0156 - Conciliación Familiar</small>
+                                </div>
+                                <small class="text-muted">Hace 5 min</small>
+                            </div>
+
+                            <div class="list-group-item bg-dark border-secondary d-flex align-items-center">
+                                <div class="me-3">
+                                    <div class="rounded-circle bg-success bg-opacity-10 p-2">
+                                        <i class="fa fa-check text-success"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="fw-semibold">Expediente cerrado</div>
+                                    <small class="text-muted">EXP-2024-0142 - Con acuerdo</small>
+                                </div>
+                                <small class="text-muted">Hace 1 hora</small>
+                            </div>
+
+                            <div class="list-group-item bg-dark border-secondary d-flex align-items-center">
+                                <div class="me-3">
+                                    <div class="rounded-circle bg-warning bg-opacity-10 p-2">
+                                        <i class="fa fa-edit text-warning"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="fw-semibold">Sesión actualizada</div>
+                                    <small class="text-muted">EXP-2024-0138 - Próxima sesión programada</small>
+                                </div>
+                                <small class="text-muted">Hace 2 horas</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="col-xl-4">
+                <div class="card card-dark">
+                    <div class="card-header">
+                        <h6 class="mb-0">Acciones Rápidas</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a th:href="@{/expedientes/crear}" class="btn btn-primary">
+                                <i class="fa fa-plus me-2"></i> Nuevo Expediente
+                            </a>
+                            <a th:href="@{/usuarios/crear}" class="btn btn-outline-primary">
+                                <i class="fa fa-user-plus me-2"></i> Nuevo Usuario
+                            </a>
+                            <a th:href="@{/reportes}" class="btn btn-outline-primary">
+                                <i class="fa fa-chart-bar me-2"></i> Generar Reporte
+                            </a>
+                            <a th:href="@{/config}" class="btn btn-outline-primary">
+                                <i class="fa fa-cog me-2"></i> Configuración
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts específicos de Dashboard -->
+    <th:block layout:fragment="scripts">
+        <script th:src="@{/js/charts-logic.js}"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Inicializar gráficos del dashboard
+                initializeCharts();
+            });
+        </script>
+    </th:block>
+</body>
+</html>

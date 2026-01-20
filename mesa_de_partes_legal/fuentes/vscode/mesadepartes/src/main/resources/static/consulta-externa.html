@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de Expedientes - IINCADE 4.0</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .login-container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .card-header {
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            text-align: center;
+            padding: 25px;
+        }
+
+        .expediente-container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 20px;
+            display: none;
+        }
+
+        .expediente-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .expediente-header {
+            border-left: 5px solid #667eea;
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .estado-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .estado-EN_PROCESO {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .estado-ATENDIDO {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .estado-PENDIENTE {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #28a745 0%, #20c997 100%);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .alert {
+            border-radius: 10px;
+            border: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            display: none;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .logo i {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .logo h3 {
+            margin: 0;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <!-- Logo -->
+        <div class="logo">
+            <i class="fas fa-gavel"></i>
+            <h3>IINCADE 4.0</h3>
+            <p>Consulta de Expedientes</p>
+        </div>
+
+        <!-- Tarjeta de Login -->
+        <div class="card" id="loginCard">
+            <div class="card-header">
+                <h5><i class="fas fa-user-lock me-2"></i>Acceso de Solicitante</h5>
+            </div>
+            <div class="card-body">
+                <!-- Alertas -->
+                <div class="alert alert-danger d-none" id="alertError" role="alert"></div>
+                <div class="alert alert-success d-none" id="alertSuccess" role="alert"></div>
+
+                <!-- Formulario -->
+                <form id="loginForm">
+                    <div class="mb-3">
+                        <label for="dni" class="form-label">
+                            <i class="fas fa-id-card me-2"></i>Número de DNI
+                        </label>
+                        <input type="text" class="form-control" id="dni"
+                               placeholder="Ingrese su número de DNI" required
+                               maxlength="20" pattern="[0-9]+">
+                        <div class="invalid-feedback">
+                            Por favor, ingrese un DNI válido
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="claveAcceso" class="form-label">
+                            <i class="fas fa-key me-2"></i>Clave de Acceso
+                        </label>
+                        <input type="password" class="form-control" id="claveAcceso"
+                               placeholder="Ingrese su clave de acceso" required
+                               maxlength="20">
+                        <div class="invalid-feedback">
+                            La clave de acceso es requerida
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Ingrese la clave de acceso que se le proporcionó para consultar su expediente
+                        </small>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100" id="btnLogin">
+                        <i class="fas fa-sign-in-alt me-2"></i>
+                        <span id="btnLoginText">Consultar Expediente</span>
+                    </button>
+                </form>
+
+                <!-- Loading -->
+                <div class="loading" id="loadingDiv">
+                    <div class="spinner"></div>
+                    <p>Validando acceso...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenedor del Expediente -->
+        <div class="expediente-container" id="expedienteContainer">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-folder-open me-2"></i>Información del Expediente</h5>
+                </div>
+                <div class="card-body" id="expedienteContent">
+                    <!-- El contenido del expediente se cargará dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle con Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8081/api/externo';
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const dni = document.getElementById('dni').value.trim();
+            const claveAcceso = document.getElementById('claveAcceso').value.trim();
+
+            if (!dni || !claveAcceso) {
+                mostrarError('Por favor, complete todos los campos');
+                return;
+            }
+
+            // Validar formato del DNI (solo números)
+            if (!/^\d+$/.test(dni)) {
+                mostrarError('El DNI debe contener solo números');
+                return;
+            }
+
+            // Validar longitud
+            if (dni.length < 8 || dni.length > 20) {
+                mostrarError('El DNI debe tener entre 8 y 20 caracteres');
+                return;
+            }
+
+            try {
+                // Generar acceso
+                mostrarLoading(true);
+                ocultarAlertas();
+
+                const response = await fetch(`${API_BASE_URL}/generar-acceso`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        dni: dni,
+                        claveAcceso: claveAcceso
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.exitoso) {
+                    mostrarExito('¡Acceso concedido! Redirigiendo...');
+
+                    // Guardar el token y redirigir a la página de consulta
+                    localStorage.setItem('accesoToken', result.token);
+                    localStorage.setItem('idExpediente', result.idExpediente);
+
+                    setTimeout(() => {
+                        window.location.href = '#expediente';
+                        cargarExpediente(result.token);
+                    }, 1500);
+
+                } else {
+                    mostrarError(result.mensaje || 'Error al generar acceso');
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarError('Error de conexión. Intente nuevamente más tarde.');
+            } finally {
+                mostrarLoading(false);
+            }
+        });
+
+        function mostrarLoading(mostrar) {
+            const loadingDiv = document.getElementById('loadingDiv');
+            const btnLogin = document.getElementById('btnLogin');
+            const btnLoginText = document.getElementById('btnLoginText');
+            const formInputs = document.querySelectorAll('#loginForm input');
+
+            if (mostrar) {
+                loadingDiv.style.display = 'block';
+                btnLogin.disabled = true;
+                btnLoginText.textContent = 'Validando...';
+                formInputs.forEach(input => input.disabled = true);
+            } else {
+                loadingDiv.style.display = 'none';
+                btnLogin.disabled = false;
+                btnLoginText.textContent = 'Consultar Expediente';
+                formInputs.forEach(input => input.disabled = false);
+            }
+        }
+
+        function mostrarError(mensaje) {
+            const alertError = document.getElementById('alertError');
+            alertError.textContent = mensaje;
+            alertError.classList.remove('d-none');
+
+            setTimeout(() => {
+                alertError.classList.add('d-none');
+            }, 5000);
+        }
+
+        function mostrarExito(mensaje) {
+            const alertSuccess = document.getElementById('alertSuccess');
+            alertSuccess.textContent = mensaje;
+            alertSuccess.classList.remove('d-none');
+        }
+
+        function ocultarAlertas() {
+            document.getElementById('alertError').classList.add('d-none');
+            document.getElementById('alertSuccess').classList.add('d-none');
+        }
+
+        async function cargarExpediente(token) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/validar-acceso`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.exitoso) {
+                    // Cargar la vista del expediente
+                    document.getElementById('loginCard').style.display = 'none';
+                    document.getElementById('expedienteContainer').style.display = 'block';
+
+                    // Generar HTML del expediente
+                    const expedienteHTML = generarHTMLExpediente(result);
+                    document.getElementById('expedienteContent').innerHTML = expedienteHTML;
+
+                    // Configurar botón de descarga
+                    configurarBotonDescarga(result.idExpediente);
+
+                } else {
+                    mostrarError(result.mensaje || 'Error al cargar expediente');
+                    document.getElementById('loginCard').style.display = 'block';
+                    document.getElementById('expedienteContainer').style.display = 'none';
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarError('Error al cargar expediente');
+                document.getElementById('loginCard').style.display = 'block';
+                document.getElementById('expedienteContainer').display = 'none';
+            }
+        }
+
+        function generarHTMLExpediente(datos) {
+            const estadoClass = getEstadoClass(datos.estadoExpediente);
+
+            return `
+                <div class="expediente-header">
+                    <h6 class="mb-2">Expediente #${datos.idExpediente}</h6>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-bold">Código: ${datos.codigoSeguimiento}</span>
+                        <span class="estado-badge ${estadoClass}">
+                            ${datos.estadoExpediente.replace('_', ' ')}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <h6 class="text-muted">Detalles del Expediente</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <small class="text-muted">Fecha de creación:</small><br>
+                            <strong>${formatearFecha(datos.fechaVencimiento)}</strong>
+                        </div>
+                        <div class="col-md-6">
+                            <small class="text-muted">Estado:</small><br>
+                            <strong>${datos.estadoExpediente.replace('_', ' ')}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Importante:</strong> Este acceso expirará en 24 horas.
+                    Puede descargar una copia de su expediente en formato PDF.
+                </div>
+
+                <div class="text-center mt-4">
+                    <button type="button" class="btn btn-success" id="btnDescargar">
+                        <i class="fas fa-download me-2"></i>Descargar Constancia en PDF
+                    </button>
+                </div>
+            `;
+        }
+
+        function getEstadoClass(estado) {
+            switch (estado) {
+                case 'EN_PROCESO': return 'estado-EN_PROCESO';
+                case 'ATENDIDO': return 'estado-ATENDIDO';
+                case 'PENDIENTE': return 'estado-PENDIENTE';
+                default: return 'bg-secondary';
+            }
+        }
+
+        function formatearFecha(fechaString) {
+            try {
+                const fecha = new Date(fechaString);
+                return fecha.toLocaleDateString('es-PE', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            } catch (e) {
+                return fechaString;
+            }
+        }
+
+        function configurarBotonDescarga(idExpediente) {
+            const btnDescargar = document.getElementById('btnDescargar');
+            const token = localStorage.getItem('accesoToken');
+
+            if (btnDescargar && token) {
+                btnDescargar.addEventListener('click', async function() {
+                    try {
+                        btnDescargar.disabled = true;
+                        btnDescargar.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Generando PDF...';
+
+                        const response = await fetch(`${API_BASE_URL}/descargar-expediente`, {
+                            method: 'GET',
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                            }
+                        });
+
+                        if (response.ok) {
+                            const blob = await response.blob();
+                            const url = window.URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.style.display = 'none';
+                            a.href = url;
+                            a.download = `constancia_expediente_${idExpediente}.pdf`;
+                            document.body.appendChild(a);
+                            a.click();
+                            window.URL.revokeObjectURL(url);
+                            document.body.removeChild(a);
+
+                            // Mostrar mensaje de éxito
+                            mostrarExito('PDF descargado correctamente');
+                        } else {
+                            mostrarError('Error al generar el PDF. Intente nuevamente.');
+                        }
+
+                    } catch (error) {
+                        console.error('Error:', error);
+                        mostrarError('Error de conexión al descargar el PDF');
+                    } finally {
+                        btnDescargar.disabled = false;
+                        btnDescargar.innerHTML = '<i class="fas fa-download me-2"></i>Descargar Constancia en PDF';
+                    }
+                });
+            }
+        }
+
+        // Manejar hash de la URL
+        window.addEventListener('hashchange', function() {
+            if (window.location.hash === '#expediente') {
+                const token = localStorage.getItem('accesoToken');
+                if (token) {
+                    cargarExpediente(token);
+                } else {
+                    window.location.hash = '';
+                    document.getElementById('loginCard').style.display = 'block';
+                    document.getElementById('expedienteContainer').style.display = 'none';
+                }
+            }
+        });
+
+        // Verificar si hay un token guardado al cargar la página
+        window.addEventListener('load', function() {
+            const token = localStorage.getItem('accesoToken');
+            if (token && window.location.hash === '#expediente') {
+                cargarExpediente(token);
+            }
+        });
+    </script>
+</body>
+</html>

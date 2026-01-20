@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mesa de Partes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link rel="icon" href="../images/icono.png">
+</head>
+<body>
+    <div class="container-fluid">
+        <p class="h3">Lista de Personas</p>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th scope="col">Apellido Paterno</th>
+                        <th scope="col">Apellido Materno</th>
+                        <th scope="col">Nombres</th>
+                        <th scope="col">Tipo Doc.</th>
+                        <th scope="col">Número Doc.</th>
+                        <th scope="col">Opciones</th>
+                    </tr>
+                </thead>
+                <tboby>
+                    <tr th:each="per:${listaPersonas}">
+                        <td th:text="${per.apellidoPaterno}"></td>
+                        <td th:text="${per.apellidoMaterno}"></td>
+                        <td th:text="${per.nombres}"></td>
+                        <td th:text="${per.tipoDocumentoIdentidad.sigla}"></td>
+                        <td th:text="${per.numeroDocumento}"></td>
+                        <td>
+                            <button type="button" class="btn btn-primary btn-xs" title="Ver detalles">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                            <button type="button" class="btn btn-info btn-xs" title="Modificar datos">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button type="button" class="btn btn-danger btn-xs" title="Eliminar registro">
+                                <i class="bi bi-x"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tboby>
+            </table>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+</body>
+</html>

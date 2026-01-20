@@ -1,0 +1,40 @@
+<!-- Multiple fragment signatures for flexibility -->
+<th:block xmlns:th="http://www.thymeleaf.org"
+         th:fragment="page-header(title, showBackButton, backUrl)"
+         th:with="processedTitle=${title ?: 'Página'},
+                  processedShowBack=${showBackButton ?: false},
+                  processedBackUrl=${backUrl ?: '/'}">
+
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div class="d-flex align-items-center">
+            <a th:if="${processedShowBack != false}"
+               th:href="${processedBackUrl}"
+               class="btn btn-outline-secondary me-3">
+                <i class="fa fa-arrow-left"></i> Volver
+            </a>
+            <h3 class="mb-0" th:text="${processedTitle}">Título de Página</h3>
+        </div>
+
+        <!-- Actions slot for additional buttons -->
+        <th:block th:fragment="actions">
+            <!-- Las páginas pueden sobreescribir esto -->
+        </th:block>
+    </div>
+</th:block>
+
+<!-- Simplified version with just title -->
+<th:block xmlns:th="http://www.thymeleaf.org"
+         th:fragment="page-header-simple(title)"
+         th:with="processedTitle=${title ?: 'Página'}">
+
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div class="d-flex align-items-center">
+            <h3 class="mb-0" th:text="${processedTitle}">Título de Página</h3>
+        </div>
+
+        <!-- Actions slot for additional buttons -->
+        <th:block th:fragment="actions">
+            <!-- Las páginas pueden sobreescribir esto -->
+        </th:block>
+    </div>
+</th:block>
