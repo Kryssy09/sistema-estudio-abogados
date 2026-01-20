@@ -1,0 +1,23 @@
+Los siguientes textos indican parte del proceso de conciliacion
+Falta ponerlo en los diagramas BPM del "Proceso Actual"
+
+cuando la conciliacion es de mutuo acuerdo:
+	ambas partes se acercan al conciliador y mediante una solicitud, requieren audiencia de conciliacion
+	el conciliador responde a la solicitud de ambas partes (mediante notificacion)
+	luego el conciliador agenda la fecha de la audiencia de conciliacion
+
+no es mutuo acuerdo
+	el/la solicitante se acerca al conciliador y mediante una solicitud, requiere audiencia de conciliacion
+	el conciliador agenda la fecha de la audiencia de conciliacion
+	el conciliador notifica a la parte invitada sobre el proceso de conciliacion
+
+todo evento de conciliacion debe tener un "acta de conciliacion"
+	resoluciones de la conciliacion/indicados en las actas:
+		- acuerdo total
+		- acuerdo partial
+		- falta de acuerdo
+		- debidamente motivada por el conciliador
+		- acta de inasistencia por una de las partes
+			hay segunda fecha de conciliacion
+		- acta de inasistencia por ambas partes
+			hay segunda fecha de conciliacion

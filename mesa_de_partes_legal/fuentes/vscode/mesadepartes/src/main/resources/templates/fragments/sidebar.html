@@ -1,0 +1,81 @@
+<th:block xmlns:th="http://www.thymeleaf.org" th:fragment="sidebar(active)">
+    <aside id="sidebar" class="sidebar bg-dark border-end">
+        <div class="p-3 d-flex align-items-center gap-2 border-bottom">
+            <i class="fa-solid fa-gavel me-2 text-accent"></i>
+            <span class="fw-semibold">IINCADE 4.0</span>
+        </div>
+
+        <nav class="nav flex-column p-2">
+            <!-- Dashboard -->
+            <th:block th:with="isActive=${active == 'dashboard'}">
+                <a class="nav-link" th:href="@{/dashboard}" th:classappend="${isActive} ? ' active'">
+                    <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                </a>
+            </th:block>
+
+            <!-- Expedientes -->
+            <th:block th:with="isActive=${active == 'expedientes'}">
+                <a class="nav-link" th:href="@{/expedientes}" th:classappend="${isActive} ? ' active'">
+                    <i class="bi bi-inboxes me-2"></i>Bandeja de Expedientes
+                </a>
+            </th:block>
+
+            <!-- Solicitantes -->
+            <th:block th:with="isActive=${active == 'solicitantes'}">
+                <a class="nav-link" th:href="@{/solicitantes}" th:classappend="${isActive} ? ' active'">
+                    <i class="bi bi-people me-2"></i>Solicitantes
+                </a>
+            </th:block>
+
+            <!-- Documentos -->
+            <th:block th:with="isActive=${active == 'documentos'}">
+                <a class="nav-link" th:href="@{/documentos}" th:classappend="${isActive} ? ' active'">
+                    <i class="bi bi-file-earmark-text me-2"></i>Documentos
+                </a>
+            </th:block>
+
+            <!-- Reportes -->
+            <th:block th:with="isActive=${active == 'reportes'}">
+                <a class="nav-link" th:href="@{/reportes}" th:classappend="${isActive} ? ' active'">
+                    <i class="bi bi-graph-up me-2"></i>Reportes
+                </a>
+            </th:block>
+
+            <!-- Administración -->
+            <th:block th:with="isAdminActive=${active == 'usuarios' || active == 'areas'}">
+                <a class="nav-link d-flex align-items-center justify-content-between"
+                    th:classappend="${!isAdminActive} ? 'collapsed'" data-bs-toggle="collapse"
+                    href="#menuAdministracion" role="button" th:aria-expanded="${isAdminActive}"
+                    aria-controls="menuAdministracion">
+                    <span><i class="bi bi-shield-lock me-2"></i>Administración</span>
+                    <i class="bi bi-chevron-down small"></i>
+                </a>
+
+                <div class="collapse" th:classappend="${isAdminActive} ? 'show'" id="menuAdministracion">
+                    <nav class="nav flex-column ms-3 mt-1">
+                        <!-- Usuarios -->
+                        <th:block th:with="isActive=${active == 'usuarios'}">
+                            <a class="nav-link" th:href="@{/usuarios}" th:classappend="${isActive} ? ' active'">
+                                <i class="bi bi-people me-2"></i>Usuarios
+                            </a>
+                        </th:block>
+
+                        <!-- Áreas -->
+                        <th:block th:with="isActive=${active == 'areas'}">
+                            <a class="nav-link" th:href="@{/areas}" th:classappend="${isActive} ? ' active'">
+                                <i class="bi bi-diagram-3 me-2"></i>Áreas
+                            </a>
+                        </th:block>
+                    </nav>
+                </div>
+            </th:block>
+
+            <!-- Configuración -->
+            <th:block th:with="isActive=${active == 'config'}">
+                <a class="nav-link" th:href="@{/config}" th:classappend="${isActive} ? ' active'">
+                    <i class="bi bi-gear me-2"></i>Configuración
+                </a>
+            </th:block>
+        </nav>
+    </aside>
+</th:block>

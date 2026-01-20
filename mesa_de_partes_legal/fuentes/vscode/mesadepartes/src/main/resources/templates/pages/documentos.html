@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/base}" th:with="activeMenu='documentos'">
+
+<head>
+    <title>Documentos Informativos</title>
+</head>
+
+<body>
+    <div layout:fragment="content">
+        <!-- Page Header -->
+        <div th:replace="~{fragments/page-header :: page-header-simple('Documentos Informativos')}"></div>
+
+        <!-- Barra de acciones -->
+        <div class="card card-dark mb-4">
+            <div class="card-body">
+                <div class="row g-3 align-items-center">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text bg-dark text-light border-secondary">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input type="text" class="form-control form-control-dark" placeholder="Buscar documentos..."
+                                id="buscadorDocumentos">
+                            <button class="btn btn-secondary" type="button" id="btnBuscarDocumentos">
+                                <i class="fa fa-search me-1"></i> Buscar
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <button class="btn btn-primary me-2" id="btnUploadDoc">
+                            <i class="fa fa-upload me-1"></i> Subir
+                        </button>
+                        <button class="btn btn-outline-secondary" id="btnOrganizarCarp">
+                            <i class="fa fa-folder me-1"></i> Organizar Carpetas
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Categorías de Documentos -->
+        <div class="row g-4">
+            <!-- Formatos (Solicitud y Conciliación) -->
+            <div class="col-xl-6">
+                <div class="card card-dark h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fa fa-file-lines me-2"></i>
+                            Formatos
+                        </h5>
+                        <span class="badge bg-primary"
+                            th:text="${#lists.size(formatosSolicitud) + #lists.size(formatosConciliacion)}">0</span>
+                    </div>
+                    <div class="card-body">
+                        <!-- SUBSECCIÓN 1: Formatos de Solicitud -->
+                        <h6 class="text-muted mb-3">
+                            <i class="fa fa-folder me-2"></i>Formatos de Solicitud
+                        </h6>
+                        <div class="list-group list-group-flush mb-4">
+                            <a th:each="archivo : ${formatosSolicitud}"
+                                th:href="@{/documentos/descargar(carpeta='formato de solicitud',archivo=${archivo.nombre})}"
+                                class="list-group-item list-group-item-action bg-dark text-light border-secondary mb-2">
+                                <div class="d-flex align-items-center">
+                                    <i th:class="${archivo.extension == 'pdf' ? 'fa fa-file-pdf text-danger' : 
+                                                  archivo.extension == 'docx' || archivo.extension == 'doc' ? 'fa fa-file-word text-primary' : 
+                                                  archivo.extension == 'xlsx' || archivo.extension == 'xls' ? 'fa fa-file-excel text-success' :
+                                                  'fa fa-file text-secondary'}" class="me-3 fa-lg"></i>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-0" th:text="${archivo.nombreSinExtension}">Archivo</h6>
+                                        <small class="text-muted"
+                                            th:text="${archivo.extension.toUpperCase()}">EXT</small>
+                                    </div>
+                                    <i class="fa fa-download text-muted"></i>
+                                </div>
+                            </a>
+                            <div th:if="${#lists.isEmpty(formatosSolicitud)}" class="text-center text-muted py-3">
+                                <i class="fa fa-folder-open fa-2x mb-2 d-block"></i>
+                                <p class="mb-0">No hay formatos disponibles</p>
+                            </div>
+                        </div>
+
+                        <!-- SUBSECCIÓN 2: Formatos de Conciliación -->
+                        <h6 class="text-muted mb-3">
+                            <i class="fa fa-folder me-2"></i>Formatos de Conciliación
+                        </h6>
+                        <div class="list-group list-group-flush">
+                            <a th:each="archivo : ${formatosConciliacion}"
+                                th:href="@{/documentos/descargar(carpeta='formato de conciliacion',archivo=${archivo.nombre})}"
+                                class="list-group-item list-group-item-action bg-dark text-light border-secondary mb-2">
+                                <div class="d-flex align-items-center">
+                                    <i th:class="${archivo.extension == 'pdf' ? 'fa fa-file-pdf text-danger' : 
+                                                  archivo.extension == 'docx' || archivo.extension == 'doc' ? 'fa fa-file-word text-primary' : 
+                                                  archivo.extension == 'xlsx' || archivo.extension == 'xls' ? 'fa fa-file-excel text-success' :
+                                                  'fa fa-file text-secondary'}" class="me-3 fa-lg"></i>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-0" th:text="${archivo.nombreSinExtension}">Archivo</h6>
+                                        <small class="text-muted"
+                                            th:text="${archivo.extension.toUpperCase()}">EXT</small>
+                                    </div>
+                                    <i class="fa fa-download text-muted"></i>
+                                </div>
+                            </a>
+                            <div th:if="${#lists.isEmpty(formatosConciliacion)}" class="text-center text-muted py-3">
+                                <i class="fa fa-folder-open fa-2x mb-2 d-block"></i>
+                                <p class="mb-0">No hay formatos disponibles</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Documentos Legales -->
+            <div class="col-xl-6">
+                <div class="card card-dark h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fa fa-balance-scale me-2"></i>
+                            Documentos Legales
+                        </h5>
+                        <span class="badge bg-success">5</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group list-group-flush">
+                            <a href="#"
+                                class="list-group-item list-group-item-action bg-dark text-light border-secondary mb-2">
+                                <div class="d-flex align-items-center">
+                                    <i class="fa fa-file-pdf me-3 text-danger"></i>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-0">Código de Ética</h6>
+                                        <small class="text-muted">Versión 2024</small>
+                                    </div>
+                                    <i class="fa fa-download text-muted"></i>
+                                </div>
+                            </a>
+                            <a href="#"
+                                class="list-group-item list-group-item-action bg-dark text-light border-secondary mb-2">
+                                <div class="d-flex align-items-center">
+                                    <i class="fa fa-file-pdf me-3 text-danger"></i>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-0">Reglamento Interno</h6>
+                                        <small class="text-muted">Actualizado 2024</small>
+                                    </div>
+                                    <i class="fa fa-download text-muted"></i>
+                                </div>
+                            </a>
+                            <a href="#"
+                                class="list-group-item list-group-item-action bg-dark text-light border-secondary mb-2">
+                                <div class="d-flex align-items-center">
+                                    <i class="fa fa-file-pdf me-3 text-danger"></i>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-0">Manual de Procedimientos</h6>
+                                        <small class="text-muted">Procesos y protocolos</small>
+                                    </div>
+                                    <i class="fa fa-download text-muted"></i>
+                                </div>
+                            </a>
+                            <a href="#"
+                                class="list-group-item list-group-item-action bg-dark text-light border-secondary mb-2">
+                                <div class="d-flex align-items-center">
+                                    <i class="fa fa-file-word me-3 text-primary"></i>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-0">Contrato de Servicios</h6>
+                                        <small class="text-muted">Modelo estándar</small>
+                                    </div>
+                                    <i class="fa fa-download text-muted"></i>
+                                </div>
+                            </a>
+                            <a href="#"
+                                class="list-group-item list-group-item-action bg-dark text-light border-secondary">
+                                <div class="d-flex align-items-center">
+                                    <i class="fa fa-file-excel me-3 text-success"></i>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-0">Tarifario de Servicios</h6>
+                                        <small class="text-muted">Vigente 2024</small>
+                                    </div>
+                                    <i class="fa fa-download text-muted"></i>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Guías y Manuales -->
+            <div class="col-xl-6">
+                <div class="card card-dark h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fa fa-book me-2"></i>
+                            Guías y Manuales
+                        </h5>
+                        <span class="badge bg-info">4</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group list-group-flush">
+                            <a href="#"
+                                class="list-group-item list-group-item-action bg-dark text-light border-secondary mb-2">
+                                <div class="d-flex align-items-center">
+                                    <i class="fa fa-file-pdf me-3 text-danger"></i>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-0">Guía de Usuario del Sistema</h6>
+                                        <small class="text-muted">Tutorial completo</small>
+                                    </div>
+                                    <i class="fa fa-download text-muted"></i>
+                                </div>
+                            </a>
+                            <a href="#"
+                                class="list-group-item list-group-item-action bg-dark text-light border-secondary mb-2">
+                                <div class="d-flex align-items-center">
+                                    <i class="fa fa-file-pdf me-3 text-danger"></i>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-0">Manual de Conciliación</h6>
+                                        <small class="text-muted">Procesos conciliatorios</small>
+                                    </div>
+                                    <i class="fa fa-download text-muted"></i>
+                                </div>
+                            </a>
+                            <a href="#"
+                                class="list-group-item list-group-item-action bg-dark text-light border-secondary mb-2">
+                                <div class="d-flex align-items-center">
+                                    <i class="fa fa-file-powerpoint me-3 text-warning"></i>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-0">Presentación Institucional</h6>
+                                        <small class="text-muted">Información general</small>
+                                    </div>
+                                    <i class="fa fa-download text-muted"></i>
+                                </div>
+                            </a>
+                            <a href="#"
+                                class="list-group-item list-group-item-action bg-dark text-light border-secondary">
+                                <div class="d-flex align-items-center">
+                                    <i class="fa fa-file-pdf me-3 text-danger"></i>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-0">F.A.Q. Preguntas Frecuentes</h6>
+                                        <small class="text-muted">Dudas comunes</small>
+                                    </div>
+                                    <i class="fa fa-download text-muted"></i>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Documentos de Soporte -->
+            <div class="col-xl-6">
+                <div class="card card-dark h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fa fa-tools me-2"></i>
+                            Soporte Técnico
+                        </h5>
+                        <span class="badge bg-warning">3</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group list-group-flush">
+                            <a href="#"
+                                class="list-group-item list-group-item-action bg-dark text-light border-secondary mb-2">
+                                <div class="d-flex align-items-center">
+                                    <i class="fa fa-file-pdf me-3 text-danger"></i>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-0">Guía de Instalación</h6>
+                                        <small class="text-muted">Requisitos y configuración</small>
+                                    </div>
+                                    <i class="fa fa-download text-muted"></i>
+                                </div>
+                            </a>
+                            <a href="#"
+                                class="list-group-item list-group-item-action bg-dark text-light border-secondary mb-2">
+                                <div class="d-flex align-items-center">
+                                    <i class="fa fa-file-video me-3 text-info"></i>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-0">Tutoriales en Video</h6>
+                                        <small class="text-muted">Capacitación visual</small>
+                                    </div>
+                                    <i class="fa fa-play-circle text-muted"></i>
+                                </div>
+                            </a>
+                            <a href="#"
+                                class="list-group-item list-group-item-action bg-dark text-light border-secondary">
+                                <div class="d-flex align-items-center">
+                                    <i class="fa fa-file-zip me-3 text-secondary"></i>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-0">Recursos Adicionales</h6>
+                                        <small class="text-muted">Plantillas y ejemplos</small>
+                                    </div>
+                                    <i class="fa fa-download text-muted"></i>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estadísticas de Documentos -->
+        <div class="card card-dark mt-4">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fa fa-chart-bar me-2"></i>
+                    Estadísticas de Documentos
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h4 class="text-primary mb-0">15</h4>
+                            <small class="text-muted">Total Documentos</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h4 class="text-success mb-0">234</h4>
+                            <small class="text-muted">Descargas este mes</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h4 class="text-info mb-0">89 MB</h4>
+                            <small class="text-muted">Espacio usado</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h4 class="text-warning mb-0">7</h4>
+                            <small class="text-muted">Categorías activas</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal para subir documento -->
+        <div class="modal fade" id="uploadModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content bg-dark text-light">
+                    <div class="modal-header border-secondary">
+                        <h5 class="modal-title">Subir Archivo</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="mb-3">
+                                <label class="form-label">Archivo</label>
+                                <input type="file" class="form-control form-control-dark"
+                                    accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Carpeta de Destino</label>
+                                <select class="form-select form-control-dark" required>
+                                    <option value="">Seleccione una carpeta</option>
+                                    <option value="formato de solicitud">Formatos de Solicitud</option>
+                                    <option value="formato de conciliacion">Formatos de Conciliación</option>
+                                    <option value="documentos legales">Documentos Legales</option>
+                                    <option value="guias y manuales">Guías y Manuales</option>
+                                    <option value="soporte tecnico">Soporte Técnico</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Descripción (Opcional)</label>
+                                <textarea class="form-control form-control-dark" rows="2"
+                                    placeholder="Descripción del archivo"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer border-secondary">
+                        <button type="button" class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary">
+                            <i class="fa fa-upload me-1"></i> Subir
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts específicos de la página -->
+    <th:block layout:fragment="scripts">
+        <script th:src="@{/js/documentos.js(v=2)}"></script>
+    </th:block>
+</body>
+
+</html>

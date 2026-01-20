@@ -1,0 +1,3 @@
+- Tiempos maximos de atencion por Tipo de Expediente (SLA - Carlos)
+	Semaforo
+- El SLA tiene peso al momento de asignar los Exp.

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/base}" th:with="activeMenu='reportes'">
+
+<head>
+    <title>Reportes</title>
+</head>
+
+<body>
+    <div layout:fragment="content">
+        <!-- Page Header -->
+        <div th:replace="~{fragments/page-header :: page-header-simple('Reportes')}"></div>
+
+        <!-- Tarjetas de reportes -->
+        <div class="row g-4 mb-4">
+            <div class="col-xl-4 col-md-6">
+                <div class="card card-dark h-100 text-center" style="cursor: pointer;">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i class="fa fa-file-pdf fa-3x text-danger"></i>
+                        </div>
+                        <h5 class="card-title">Reporte de Expedientes</h5>
+                        <p class="card-text text-muted">Generar reporte detallado de todos los expedientes</p>
+                        <button class="btn btn-primary" onclick="generarReporte('expedientes')">
+                            <i class="fa fa-download me-1"></i> Generar PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-4 col-md-6">
+                <div class="card card-dark h-100 text-center" style="cursor: pointer;">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i class="fa fa-users fa-3x text-info"></i>
+                        </div>
+                        <h5 class="card-title">Reporte de Usuarios</h5>
+                        <p class="card-text text-muted">Listado de usuarios y sus roles</p>
+                        <button class="btn btn-primary" onclick="generarReporte('usuarios')">
+                            <i class="fa fa-download me-1"></i> Generar PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-4 col-md-6">
+                <div class="card card-dark h-100 text-center" style="cursor: pointer;">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i class="fa fa-chart-bar fa-3x text-success"></i>
+                        </div>
+                        <h5 class="card-title">Estadísticas</h5>
+                        <p class="card-text text-muted">Gráficos y estadísticas generales</p>
+                        <button class="btn btn-primary" onclick="mostrarEstadisticas()">
+                            <i class="fa fa-chart-line me-1"></i> Ver Estadísticas
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-4 col-md-6">
+                <div class="card card-dark h-100 text-center" style="cursor: pointer;">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i class="fa fa-clock fa-3x text-warning"></i>
+                        </div>
+                        <h5 class="card-title">Reporte de Tiempos</h5>
+                        <p class="card-text text-muted">Análisis de tiempos de atención</p>
+                        <button class="btn btn-primary" onclick="generarReporte('tiempos')">
+                            <i class="fa fa-download me-1"></i> Generar PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-4 col-md-6">
+                <div class="card card-dark h-100 text-center" style="cursor: pointer;">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i class="fa fa-calendar fa-3x text-primary"></i>
+                        </div>
+                        <h5 class="card-title">Reporte por Fechas</h5>
+                        <p class="card-text text-muted">Filtrar por rango de fechas</p>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#fechasModal">
+                            <i class="fa fa-filter me-1"></i> Filtrar Fechas
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-4 col-md-6">
+                <div class="card card-dark h-100 text-center" style="cursor: pointer;">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <i class="fa fa-file-excel fa-3x text-success"></i>
+                        </div>
+                        <h5 class="card-title">Exportar a Excel</h5>
+                        <p class="card-text text-muted">Exportar datos a formato Excel</p>
+                        <button class="btn btn-success" onclick="exportarExcel()">
+                            <i class="fa fa-file-excel me-1"></i> Exportar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráfico de Expedientes por Tipo -->
+        <div class="card card-dark">
+            <div class="card-header">
+                <h5 class="mb-0">Expedientes por Tipo</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="reportChart" height="120"></canvas>
+            </div>
+        </div>
+
+        <!-- Modal de fechas -->
+        <div class="modal fade" id="fechasModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content bg-dark text-light">
+                    <div class="modal-header border-secondary">
+                        <h5 class="modal-title">Seleccionar Rango de Fechas</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="mb-3">
+                                <label for="fechaInicio" class="form-label">Fecha Inicio</label>
+                                <input type="date" class="form-control" id="fechaInicio" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="fechaFin" class="form-label">Fecha Fin</label>
+                                <input type="date" class="form-control" id="fechaFin" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="tipoReporte" class="form-label">Tipo de Reporte</label>
+                                <select class="form-select" id="tipoReporte">
+                                    <option value="expedientes">Expedientes</option>
+                                    <option value="sesiones">Sesiones</option>
+                                    <option value="usuarios">Usuarios</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer border-secondary">
+                        <button type="button" class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary" onclick="generarReporteFechas()">
+                            <i class="fa fa-download me-1"></i> Generar Reporte
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts específicos de la página -->
+    <th:block layout:fragment="scripts">
+        <script th:src="@{/js/charts-logic.js}"></script>
+        <script>
+            function generarReporte(tipo) {
+                console.log('Generando reporte de:', tipo);
+                showToast('Generando reporte de ' + tipo + '...', 'info');
+
+                // Descargar PDF
+                const url = `/reportes/pdf/${tipo}`;
+                window.location.href = url;
+            }
+
+            function mostrarEstadisticas() {
+                console.log('Mostrando estadísticas');
+                showToast('Las estadísticas se muestran en la gráfica abajo', 'info');
+                // La gráfica ya muestra datos al cargar la página
+            }
+
+            function exportarExcel() {
+                console.log('Exportando a Excel');
+                showToast('Exportando datos a Excel...', 'info');
+
+                // Descargar Excel
+                window.location.href = '/reportes/excel/expedientes';
+            }
+
+            function generarReporteFechas() {
+                const fechaInicio = document.getElementById('fechaInicio').value;
+                const fechaFin = document.getElementById('fechaFin').value;
+                const tipoReporte = document.getElementById('tipoReporte').value;
+
+                if (!fechaInicio || !fechaFin) {
+                    showToast('Por favor selecciona ambas fechas', 'warning');
+                    return;
+                }
+
+                console.log('Generando reporte por fechas:', { fechaInicio, fechaFin, tipoReporte });
+                showToast('Generando reporte del ' + fechaInicio + ' al ' + fechaFin, 'info');
+
+                // Por ahora genera el reporte normal
+                // Puedes implementar filtrado por fechas después
+                generarReporte(tipoReporte);
+
+                // Cerrar modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('fechasModal'));
+                if (modal) modal.hide();
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                // Inicializar gráfico
+                initializeCharts();
+            });
+        </script>
+    </th:block>
+</body>
+
+</html>

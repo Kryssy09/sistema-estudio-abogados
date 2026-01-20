@@ -1,0 +1,598 @@
+/*M!999999\- enable the sandbox mode */ 
+-- MariaDB dump 10.19  Distrib 10.11.14-MariaDB, for debian-linux-gnu (x86_64)
+--
+-- Host: localhost    Database: mesa_de_partes
+-- ------------------------------------------------------
+-- Server version	10.11.14-MariaDB-0+deb12u2
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `area`
+--
+
+DROP TABLE IF EXISTS `area`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `area` (
+  `idArea` int(11) NOT NULL AUTO_INCREMENT,
+  `idUsuarioDirector` int(11) DEFAULT NULL,
+  `nombreArea` varchar(100) NOT NULL,
+  `idUsuarioCreador` int(11) NOT NULL,
+  `fechaCreacion` datetime NOT NULL,
+  `idUsuarioModificador` int(11) DEFAULT NULL,
+  `fechaModificacion` datetime DEFAULT NULL,
+  `estadoRegistro` varchar(4) NOT NULL,
+  PRIMARY KEY (`idArea`),
+  KEY `idUsuarioDirector` (`idUsuarioDirector`),
+  CONSTRAINT `area_ibfk_1` FOREIGN KEY (`idUsuarioDirector`) REFERENCES `usuario` (`idUsuario`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `area`
+--
+
+LOCK TABLES `area` WRITE;
+/*!40000 ALTER TABLE `area` DISABLE KEYS */;
+/*!40000 ALTER TABLE `area` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `documento_normativo`
+--
+
+DROP TABLE IF EXISTS `documento_normativo`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `documento_normativo` (
+  `idDocumentoNormativo` int(11) NOT NULL AUTO_INCREMENT,
+  `nombreDocumento` varchar(250) NOT NULL,
+  `rutaArchivo` varchar(1000) NOT NULL,
+  `idUsuarioCreador` int(11) NOT NULL,
+  `fechaCreacion` datetime NOT NULL,
+  `idUsuarioModificador` int(11) DEFAULT NULL,
+  `fechaModificacion` datetime DEFAULT NULL,
+  `estadoRegistro` varchar(4) NOT NULL,
+  PRIMARY KEY (`idDocumentoNormativo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `documento_normativo`
+--
+
+LOCK TABLES `documento_normativo` WRITE;
+/*!40000 ALTER TABLE `documento_normativo` DISABLE KEYS */;
+/*!40000 ALTER TABLE `documento_normativo` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `dominio`
+--
+
+DROP TABLE IF EXISTS `dominio`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `dominio` (
+  `idDominio` int(11) NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(100) NOT NULL,
+  `idUsuarioCreador` int(11) NOT NULL,
+  `fechaCreacion` datetime NOT NULL,
+  `idUsuarioModificador` int(11) DEFAULT NULL,
+  `fechaModificacion` datetime DEFAULT NULL,
+  `estadoRegistro` varchar(4) NOT NULL,
+  PRIMARY KEY (`idDominio`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `dominio`
+--
+
+LOCK TABLES `dominio` WRITE;
+/*!40000 ALTER TABLE `dominio` DISABLE KEYS */;
+INSERT INTO `dominio` VALUES
+(1,'TIPO DE DOCUMENTO DE IDENTIDAD',1,'2025-10-06 16:39:18',NULL,NULL,'ACT'),
+(2,'SEXO DE PERSONAS',1,'2025-10-06 16:44:16',NULL,NULL,'ACT');
+/*!40000 ALTER TABLE `dominio` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `dominio_detalle`
+--
+
+DROP TABLE IF EXISTS `dominio_detalle`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `dominio_detalle` (
+  `idDominioDetalle` int(11) NOT NULL AUTO_INCREMENT,
+  `idDominio` int(11) NOT NULL,
+  `codigo` int(11) NOT NULL,
+  `nombre` varchar(100) NOT NULL,
+  `sigla` varchar(20) NOT NULL,
+  `valorCadena` varchar(4000) DEFAULT NULL,
+  `idUsuarioCreador` int(11) NOT NULL,
+  `fechaCreacion` datetime NOT NULL,
+  `idUsuarioModificador` int(11) DEFAULT NULL,
+  `fechaModificacion` datetime DEFAULT NULL,
+  `estadoRegistro` varchar(4) DEFAULT NULL,
+  PRIMARY KEY (`idDominioDetalle`),
+  KEY `idDominio` (`idDominio`),
+  CONSTRAINT `dominio_detalle_ibfk_1` FOREIGN KEY (`idDominio`) REFERENCES `dominio` (`idDominio`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `dominio_detalle`
+--
+
+LOCK TABLES `dominio_detalle` WRITE;
+/*!40000 ALTER TABLE `dominio_detalle` DISABLE KEYS */;
+INSERT INTO `dominio_detalle` VALUES
+(1,1,1,'DOCUMENTO NACIONAL DE IDENTIDAD','DNI',NULL,1,'2025-10-06 16:41:15',NULL,NULL,'ACT'),
+(2,2,1,'MASCULINO','M',NULL,1,'2025-10-06 16:44:26',NULL,NULL,'ACT'),
+(3,2,2,'FEMENINO','F',NULL,1,'2025-10-06 16:44:29',NULL,NULL,'ACT');
+/*!40000 ALTER TABLE `dominio_detalle` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `expediente`
+--
+
+DROP TABLE IF EXISTS `expediente`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `expediente` (
+  `idExpediente` int(11) NOT NULL AUTO_INCREMENT,
+  `tipoExpediente` varchar(3) NOT NULL,
+  `mutuoAcuerdo` bit(1) DEFAULT NULL,
+  `especialidad` int(11) NOT NULL,
+  `codigoSeguimiento` varchar(50) NOT NULL,
+  `estadoExpediente` varchar(8) NOT NULL,
+  `estadoLegalCaso` varchar(10) DEFAULT NULL,
+  `idSolicitante` int(11) NOT NULL,
+  `rutaArchivoFormatoSolicitud` varchar(1000) NOT NULL,
+  `reseniaSolicitud` varchar(4000) NOT NULL,
+  `idInvitado` int(11) DEFAULT NULL,
+  `idUsuarioAsignado` int(11) DEFAULT NULL,
+  `fechaAsignacion` datetime DEFAULT NULL,
+  `slaParaAsignacion` int(11) DEFAULT NULL,
+  `fechaNotificacionInicial` datetime DEFAULT NULL,
+  `slaParaNotificacionInicial` int(11) DEFAULT NULL,
+  `idExpedienteOrigen` int(11) DEFAULT NULL,
+  `idUsuarioCreador` int(11) NOT NULL,
+  `fechaCreacion` datetime NOT NULL,
+  `idUsuarioModificador` int(11) DEFAULT NULL,
+  `fechaModificacion` datetime DEFAULT NULL,
+  `estadoRegistro` varchar(4) NOT NULL,
+  PRIMARY KEY (`idExpediente`),
+  KEY `idSolicitante` (`idSolicitante`),
+  KEY `idInvitado` (`idInvitado`),
+  KEY `idUsuarioAsignado` (`idUsuarioAsignado`),
+  CONSTRAINT `expediente_ibfk_1` FOREIGN KEY (`idSolicitante`) REFERENCES `solicitante` (`idSolicitante`),
+  CONSTRAINT `expediente_ibfk_2` FOREIGN KEY (`idInvitado`) REFERENCES `invitado` (`idInvitado`),
+  CONSTRAINT `expediente_ibfk_3` FOREIGN KEY (`idUsuarioAsignado`) REFERENCES `usuario` (`idUsuario`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `expediente`
+--
+
+LOCK TABLES `expediente` WRITE;
+/*!40000 ALTER TABLE `expediente` DISABLE KEYS */;
+/*!40000 ALTER TABLE `expediente` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `expediente_enlace_reporte`
+--
+
+DROP TABLE IF EXISTS `expediente_enlace_reporte`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `expediente_enlace_reporte` (
+  `idEnlace` int(11) NOT NULL AUTO_INCREMENT,
+  `idExpediente` int(11) NOT NULL,
+  `tokenAcceso` varchar(1000) NOT NULL,
+  `estadoToken` varchar(4) NOT NULL,
+  `idUsuarioCreador` int(11) NOT NULL,
+  `fechaCreacion` datetime NOT NULL,
+  `idUsuarioModificador` int(11) DEFAULT NULL,
+  `fechaModificacion` datetime DEFAULT NULL,
+  `estadoRegistro` varchar(4) NOT NULL,
+  PRIMARY KEY (`idEnlace`),
+  KEY `idExpediente` (`idExpediente`),
+  CONSTRAINT `expediente_enlace_reporte_ibfk_1` FOREIGN KEY (`idExpediente`) REFERENCES `expediente` (`idExpediente`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `expediente_enlace_reporte`
+--
+
+LOCK TABLES `expediente_enlace_reporte` WRITE;
+/*!40000 ALTER TABLE `expediente_enlace_reporte` DISABLE KEYS */;
+/*!40000 ALTER TABLE `expediente_enlace_reporte` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `expediente_sesion`
+--
+
+DROP TABLE IF EXISTS `expediente_sesion`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `expediente_sesion` (
+  `idExpedienteSesion` int(11) NOT NULL AUTO_INCREMENT,
+  `idExpediente` int(11) NOT NULL,
+  `secuencia` int(11) NOT NULL,
+  `fechaSesion` datetime NOT NULL,
+  `estadoSesion` varchar(6) NOT NULL,
+  `detallesSesion` varchar(4000) NOT NULL,
+  `resolucionSesion` int(11) DEFAULT NULL,
+  `rutaArchivoActa` varchar(1000) DEFAULT NULL,
+  `idUsuarioCreador` int(11) NOT NULL,
+  `fechaCreacion` datetime NOT NULL,
+  `idUsuarioModificador` int(11) DEFAULT NULL,
+  `fechaModificacion` datetime DEFAULT NULL,
+  `estadoRegistro` varchar(4) NOT NULL,
+  PRIMARY KEY (`idExpedienteSesion`),
+  KEY `idExpediente` (`idExpediente`),
+  CONSTRAINT `expediente_sesion_ibfk_1` FOREIGN KEY (`idExpediente`) REFERENCES `expediente` (`idExpediente`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `expediente_sesion`
+--
+
+LOCK TABLES `expediente_sesion` WRITE;
+/*!40000 ALTER TABLE `expediente_sesion` DISABLE KEYS */;
+/*!40000 ALTER TABLE `expediente_sesion` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `expediente_sesion_archivo`
+--
+
+DROP TABLE IF EXISTS `expediente_sesion_archivo`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `expediente_sesion_archivo` (
+  `idExpedienteSesionArchivo` int(11) NOT NULL AUTO_INCREMENT,
+  `idExpedienteSesion` int(11) NOT NULL,
+  `nombreDocumento` varchar(250) NOT NULL,
+  `rutaArchivo` varchar(1000) NOT NULL,
+  `idUsuarioCreador` int(11) NOT NULL,
+  `fechaCreacion` datetime NOT NULL,
+  `idUsuarioModificador` int(11) DEFAULT NULL,
+  `fechaModificacion` datetime DEFAULT NULL,
+  `estadoRegistro` varchar(4) NOT NULL,
+  PRIMARY KEY (`idExpedienteSesionArchivo`),
+  KEY `idExpedienteSesion` (`idExpedienteSesion`),
+  CONSTRAINT `expediente_sesion_archivo_ibfk_1` FOREIGN KEY (`idExpedienteSesion`) REFERENCES `expediente_sesion` (`idExpedienteSesion`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `expediente_sesion_archivo`
+--
+
+LOCK TABLES `expediente_sesion_archivo` WRITE;
+/*!40000 ALTER TABLE `expediente_sesion_archivo` DISABLE KEYS */;
+/*!40000 ALTER TABLE `expediente_sesion_archivo` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `invitado`
+--
+
+DROP TABLE IF EXISTS `invitado`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `invitado` (
+  `idInvitado` int(11) NOT NULL AUTO_INCREMENT,
+  `idPersona` int(11) NOT NULL,
+  `idUsuarioCreador` int(11) NOT NULL,
+  `fechaCreacion` datetime NOT NULL,
+  `idUsuarioModificador` int(11) DEFAULT NULL,
+  `fechaModificacion` datetime DEFAULT NULL,
+  `estadoRegistro` varchar(4) NOT NULL,
+  PRIMARY KEY (`idInvitado`),
+  KEY `idPersona` (`idPersona`),
+  CONSTRAINT `invitado_ibfk_1` FOREIGN KEY (`idPersona`) REFERENCES `persona` (`idPersona`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `invitado`
+--
+
+LOCK TABLES `invitado` WRITE;
+/*!40000 ALTER TABLE `invitado` DISABLE KEYS */;
+/*!40000 ALTER TABLE `invitado` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `modulo`
+--
+
+DROP TABLE IF EXISTS `modulo`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `modulo` (
+  `idModulo` int(11) NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(100) NOT NULL,
+  `idUsuarioCreador` int(11) NOT NULL,
+  `fechaCreacion` datetime NOT NULL,
+  `idUsuarioModificador` int(11) DEFAULT NULL,
+  `fechaModificacion` datetime DEFAULT NULL,
+  `estadoRegistro` varchar(4) NOT NULL,
+  PRIMARY KEY (`idModulo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `modulo`
+--
+
+LOCK TABLES `modulo` WRITE;
+/*!40000 ALTER TABLE `modulo` DISABLE KEYS */;
+/*!40000 ALTER TABLE `modulo` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `notificacion`
+--
+
+DROP TABLE IF EXISTS `notificacion`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `notificacion` (
+  `idNotificacion` int(11) NOT NULL AUTO_INCREMENT,
+  `idExpediente` int(11) NOT NULL,
+  `procesoOrigen` int(11) NOT NULL,
+  `estadoNotificacion` varchar(4) NOT NULL,
+  `fechaEnvio` datetime DEFAULT NULL,
+  `remitente` varchar(100) NOT NULL,
+  `destinatarios` varchar(1000) DEFAULT NULL,
+  `esPorCorreo` bit(1) NOT NULL,
+  `conCopia` varchar(1000) DEFAULT NULL,
+  `conCopiaOculta` varchar(1000) DEFAULT NULL,
+  `asunto` varchar(1000) NOT NULL,
+  `mensaje` varchar(4000) NOT NULL,
+  `idUsuarioCreador` int(11) NOT NULL,
+  `fechaCreacion` datetime NOT NULL,
+  `idUsuarioModificador` int(11) DEFAULT NULL,
+  `fechaModificacion` datetime DEFAULT NULL,
+  `estadoRegistro` varchar(4) NOT NULL,
+  PRIMARY KEY (`idNotificacion`),
+  KEY `idExpediente` (`idExpediente`),
+  CONSTRAINT `notificacion_ibfk_1` FOREIGN KEY (`idExpediente`) REFERENCES `expediente` (`idExpediente`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `notificacion`
+--
+
+LOCK TABLES `notificacion` WRITE;
+/*!40000 ALTER TABLE `notificacion` DISABLE KEYS */;
+/*!40000 ALTER TABLE `notificacion` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `persona`
+--
+
+DROP TABLE IF EXISTS `persona`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `persona` (
+  `idPersona` int(11) NOT NULL AUTO_INCREMENT,
+  `apellidoPaterno` varchar(100) NOT NULL,
+  `apellidoMaterno` varchar(100) DEFAULT NULL,
+  `nombres` varchar(100) NOT NULL,
+  `tipoDocumentoIdentidad` int(11) NOT NULL,
+  `numeroDocumento` varchar(20) NOT NULL,
+  `correoElectronico` varchar(100) DEFAULT NULL,
+  `telefonoPersonal` varchar(20) DEFAULT NULL,
+  `sexo` int(11) DEFAULT NULL,
+  `rutaFoto` varchar(1000) DEFAULT NULL,
+  `idUsuarioCreador` int(11) NOT NULL,
+  `fechaCreacion` datetime NOT NULL,
+  `idUsuarioModificador` int(11) DEFAULT NULL,
+  `fechaModificacion` datetime DEFAULT NULL,
+  `estadoRegistro` varchar(4) NOT NULL,
+  PRIMARY KEY (`idPersona`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `persona`
+--
+
+LOCK TABLES `persona` WRITE;
+/*!40000 ALTER TABLE `persona` DISABLE KEYS */;
+INSERT INTO `persona` VALUES
+(1,'MORENO','HERNANDEZ','MIGUEL ANGEL',1,'43481765','swmiguel3@gmail.com','993808061',1,NULL,1,'2025-10-06 16:57:33',NULL,NULL,'ACT');
+/*!40000 ALTER TABLE `persona` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `rol`
+--
+
+DROP TABLE IF EXISTS `rol`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `rol` (
+  `idRol` int(11) NOT NULL AUTO_INCREMENT,
+  `nombreRol` varchar(50) NOT NULL,
+  `idUsuarioCreador` int(11) NOT NULL,
+  `fechaCreacion` datetime NOT NULL,
+  `idUsuarioModificador` int(11) DEFAULT NULL,
+  `fechaModificacion` datetime DEFAULT NULL,
+  `estadoRegistro` varchar(4) NOT NULL,
+  PRIMARY KEY (`idRol`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `rol`
+--
+
+LOCK TABLES `rol` WRITE;
+/*!40000 ALTER TABLE `rol` DISABLE KEYS */;
+/*!40000 ALTER TABLE `rol` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `rol_modulo`
+--
+
+DROP TABLE IF EXISTS `rol_modulo`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `rol_modulo` (
+  `idRol` int(11) NOT NULL,
+  `idModulo` int(11) NOT NULL,
+  `idUsuarioCreador` int(11) NOT NULL,
+  `fechaCreacion` datetime NOT NULL,
+  `idUsuarioModificador` int(11) DEFAULT NULL,
+  `fechaModificacion` datetime DEFAULT NULL,
+  `estadoRegistro` varchar(4) NOT NULL,
+  PRIMARY KEY (`idRol`,`idModulo`),
+  KEY `idModulo` (`idModulo`),
+  CONSTRAINT `rol_modulo_ibfk_1` FOREIGN KEY (`idRol`) REFERENCES `rol` (`idRol`),
+  CONSTRAINT `rol_modulo_ibfk_2` FOREIGN KEY (`idModulo`) REFERENCES `modulo` (`idModulo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `rol_modulo`
+--
+
+LOCK TABLES `rol_modulo` WRITE;
+/*!40000 ALTER TABLE `rol_modulo` DISABLE KEYS */;
+/*!40000 ALTER TABLE `rol_modulo` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `solicitante`
+--
+
+DROP TABLE IF EXISTS `solicitante`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `solicitante` (
+  `idSolicitante` int(11) NOT NULL AUTO_INCREMENT,
+  `idPersona` int(11) NOT NULL,
+  `idUsuarioCreador` int(11) NOT NULL,
+  `fechaCreacion` datetime NOT NULL,
+  `idUsuarioModificador` int(11) DEFAULT NULL,
+  `fechaModificacion` datetime DEFAULT NULL,
+  `estadoRegistro` varchar(20) NOT NULL,
+  PRIMARY KEY (`idSolicitante`),
+  KEY `idPersona` (`idPersona`),
+  CONSTRAINT `solicitante_ibfk_1` FOREIGN KEY (`idPersona`) REFERENCES `persona` (`idPersona`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `solicitante`
+--
+
+LOCK TABLES `solicitante` WRITE;
+/*!40000 ALTER TABLE `solicitante` DISABLE KEYS */;
+/*!40000 ALTER TABLE `solicitante` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `usuario`
+--
+
+DROP TABLE IF EXISTS `usuario`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `usuario` (
+  `idUsuario` int(11) NOT NULL AUTO_INCREMENT,
+  `idPersona` int(11) NOT NULL,
+  `nombreUsuario` varchar(20) NOT NULL,
+  `clave` varchar(1000) NOT NULL,
+  `idUsuarioCreador` int(11) NOT NULL,
+  `fechaCreacion` datetime NOT NULL,
+  `idUsuarioModificador` int(11) DEFAULT NULL,
+  `fechaModificacion` datetime DEFAULT NULL,
+  `estadoRegistro` varchar(4) NOT NULL,
+  PRIMARY KEY (`idUsuario`),
+  KEY `idPersona` (`idPersona`),
+  CONSTRAINT `usuario_ibfk_1` FOREIGN KEY (`idPersona`) REFERENCES `persona` (`idPersona`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `usuario`
+--
+
+LOCK TABLES `usuario` WRITE;
+/*!40000 ALTER TABLE `usuario` DISABLE KEYS */;
+/*!40000 ALTER TABLE `usuario` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `usuario_rol`
+--
+
+DROP TABLE IF EXISTS `usuario_rol`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `usuario_rol` (
+  `idUsuario` int(11) NOT NULL,
+  `idRol` int(11) NOT NULL,
+  `idUsuarioCreador` int(11) NOT NULL,
+  `fechaCreacion` datetime NOT NULL,
+  `idUsuarioModificador` int(11) DEFAULT NULL,
+  `fechaModificacion` datetime DEFAULT NULL,
+  `estadoRegistro` varchar(4) NOT NULL,
+  PRIMARY KEY (`idUsuario`,`idRol`),
+  KEY `idRol` (`idRol`),
+  CONSTRAINT `usuario_rol_ibfk_1` FOREIGN KEY (`idRol`) REFERENCES `rol` (`idRol`),
+  CONSTRAINT `usuario_rol_ibfk_2` FOREIGN KEY (`idUsuario`) REFERENCES `usuario` (`idUsuario`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `usuario_rol`
+--
+
+LOCK TABLES `usuario_rol` WRITE;
+/*!40000 ALTER TABLE `usuario_rol` DISABLE KEYS */;
+/*!40000 ALTER TABLE `usuario_rol` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Dumping routines for database 'mesa_de_partes'
+--
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2025-10-06 18:39:48
