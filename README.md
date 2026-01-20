@@ -1,4 +1,4 @@
-# ⚖️ Sistema de Gestión – Estudio de Abogados
+# Sistema de Gestión – Estudio de Abogados
 Sistema de Mesa de Partes Virtual – IINCADE 4.0
 
 ## 📌 Descripción del Proyecto
