@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.*;
 
 @Controller
 public class LoginController {
-
+    // Controlador encargado de la autenticación y cierre de sesión
+    // del módulo de Mesa de Partes Virtual
     @GetMapping("/login")
     public String login() {
         return "index";
