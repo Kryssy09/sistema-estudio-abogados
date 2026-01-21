@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/base}">
+
+<head>
+    <title>Editar Sesión</title>
+</head>
+
+<body>
+    <div layout:fragment="content">
+        <!-- Page Header -->
+        <div th:replace="~{fragments/page-header :: page-header('Editar Sesión', true, '/expedientes/editar/' + ${expediente.idExpediente})}"></div>
+
+        <!-- FILTRO Principal -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fa fa-calendar-alt me-2"></i>
+                    Editar Sesión del Expediente <span th:text="${expediente.codigoSeguimiento}"></span>
+                </h5>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/expedientes/sesiones/{id}/editar(id=${sesion.idExpedienteSesion})}"
+                      method="post"
+                      th:object="${sesion}"
+                      enctype="multipart/form-data">
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                          <label class="form-label">Cód. Seguimiento Expediente</label>
+                          <input type="text" class="form-control" th:value="${expediente.codigoSeguimiento}" disabled>
+                        </div>
+                        <div class="col-md-4">
+                          <label class="form-label">Estado del Expediente</label>
+                          <input type="text" class="form-control" th:value="${expediente.estadoExpediente}" disabled>
+                        </div>
+                      </div>
+                      <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                          <label class="form-label">Número de Sesión</label>
+                          <input type="text" class="form-control" th:value="${sesion.secuencia}" disabled>
+                        </div>
+                        <div class="col-md-4">
+                          <label class="form-label">Fecha de Sesión</label>
+                          <input type="datetime-local" class="form-control" name="fechaSesion" th:value="${#temporals.format(sesion.fechaSesion, 'yyyy-MM-dd''T''HH:mm')}">
+                        </div>
+                      </div>
+                      <div class="row g-3 mb-3">
+                        <div class="col-12">
+                          <label class="form-label">Detalles de Sesión</label>
+                          <textarea class="form-control" name="detallesSesion" rows="4" th:text="${sesion.detallesSesion}"></textarea>
+                        </div>
+                      </div>
+                      <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                          <label class="form-label">Resolución</label>
+                          <input type="number" class="form-control" name="resolucionSesion" th:value="${sesion.resolucionSesion}">
+                        </div>
+                      </div>
+                      <hr class="border-light mt-4">
+                      <div class="d-flex justify-content-start flex-wrap gap-2 mt-3">
+                        <button class="btn btn-secondary" id="btnAdjuntarDoc"><i class="fa fa-upload me-1"></i> Adjuntar Documento</button>
+                        <button class="btn btn-success"><i class="fa fa-save me-1"></i> Guardar</button>
+                        <button class="btn btn-primary"><i class="fa fa-file-signature me-1"></i> Generar Acta</button>
+                        <button class="btn btn-info"><i class="fa fa-file-arrow-up me-1"></i> Cargar Acta Firmada</button>
+                        <a th:href="@{/expedientes/editar/{id}(id=${expediente.idExpediente})}" class="btn btn-danger"><i class="fa fa-times me-1"></i> Cerrar</a>
+                      </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

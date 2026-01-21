@@ -1,0 +1,140 @@
+<!-- templates/areas/_tabla.html -->
+<div id="areasTable" th:fragment="tabla(areasPage, q, size)" th:inline="text">
+  <form id="stateForm" class="d-none">
+    <input type="hidden" name="size" th:value="${areasPage.size}">
+    <input type="hidden" name="q" th:value="${q}">
+    <input type="hidden" name="page" th:value="${areasPage.number}">
+  </form>
+
+  <div class="card card-dark">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-dark table-hover mb-0">
+          <thead>
+            <tr>
+              <th style="width: 70%;">Nombre de Área</th>
+              <th style="width: 15%;">Estado</th>
+              <th class="text-end" style="width: 15%;">Opciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="u : ${areasPage.content}">
+              <td>
+                <div class="" th:title="${u.nombreArea}">
+                  <span th:text="${u.nombreArea}">Nombre de Área</span>
+                </div>
+              </td>
+
+              <td>
+                <span class="badge" th:classappend="${u.activo} ? ' bg-success' : ' bg-secondary'">
+                  <span th:text="${u.activo} ? 'Activo' : 'Inactivo'">Activo</span>
+                </span>
+              </td>
+
+              <td class="text-end">
+                <div class="dropdown">
+                  <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    <i class="fa fa-ellipsis-v"></i>
+                  </button>
+                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark">
+                    <!-- Activar/Desactivar -->
+                    <li>
+                      <button class="dropdown-item" th:attr="hx-post=@{|/areas/${u.id}/activar|}"
+                        hx-target="#areasTable" hx-swap="outerHTML" hx-include="#stateForm">
+                        <i class="fa me-2" th:classappend="${u.activo} ? 'fa-toggle-off' : 'fa-toggle-on'"></i>
+                        <span th:text="${u.activo} ? 'Desactivar' : 'Activar'">Activar</span>
+                      </button>
+                    </li>
+
+                    <!-- Editar -->
+                    <li>
+                      <button class="dropdown-item js-form-modal" th:attr="data-hx-url=@{|/areas/${u.id}/editar|}">
+                        <i class="fa fa-pencil me-2"></i> Editar
+                      </button>
+                    </li>
+
+                    <!-- Eliminar (abre modal en lista.html) -->
+                    <li>
+                      <button class="dropdown-item text-danger js-confirm-delete"
+                        th:attr="data-hx-url=@{|/areas/${u.id}|}">
+                        <i class="fa fa-trash me-2"></i> Eliminar
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              </td>
+            </tr>
+
+            <tr th:if="${areasPage.content.empty}">
+              <td colspan="4" class="text-center text-muted py-4">
+                <i class="fa fa-building fa-3x mb-3 d-block"></i>
+                No se encontraron áreas.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Paginación (solo envía 'page' por hx-vals; incluye size y q del stateForm) -->
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 p-3 border-top border-secondary">
+        <div class="small text-muted">
+          <span th:if="${areasPage.totalElements > 0}">
+            Mostrando
+            <strong th:text="${areasPage.number * areasPage.size + 1}">1</strong> –
+            <strong th:text="${areasPage.number * areasPage.size + areasPage.numberOfElements}">10</strong>
+            de <strong th:text="${areasPage.totalElements}">0</strong>
+          </span>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+
+          <!-- Page size: vuelve a page=0; mantiene q -->
+          <form class="d-flex align-items-center gap-2" th:attr="hx-post=@{/areas}" hx-target="#areasTable"
+            hx-swap="outerHTML" hx-include="#stateForm [name='q']" hx-vals='{"page":0}'>
+            <label class="small text-muted">Por página</label>
+            <select class="form-select form-select-sm bg-dark text-light border-secondary" name="size"
+              onchange="this.form.requestSubmit()">
+              <option th:value="5" th:selected="${areasPage.size == 5}">5</option>
+              <option th:value="10" th:selected="${areasPage.size == 10}">10</option>
+              <option th:value="20" th:selected="${areasPage.size == 20}">20</option>
+              <option th:value="50" th:selected="${areasPage.size == 50}">50</option>
+            </select>
+          </form>
+
+          <!-- Controles -->
+          <div class="btn-group btn-group-sm" role="group" aria-label="Paginación">
+            <!-- Primero -->
+            <button type="button" class="btn btn-outline-light js-page"
+              th:classappend="${areasPage.first} ? ' disabled' : ''" data-page="0">
+              <i class="fa fa-angle-double-left"></i>
+            </button>
+
+            <!-- Anterior -->
+            <button type="button" class="btn btn-outline-light js-page"
+              th:classappend="${areasPage.first} ? ' disabled' : ''" th:attr="data-page=${areasPage.number - 1}">
+              <i class="fa fa-angle-left"></i>
+            </button>
+
+            <span class="btn btn-outline-light disabled">
+              Página <strong th:text="${areasPage.number + 1}">1</strong> /
+              <span th:text="${areasPage.totalPages}">1</span>
+            </span>
+
+            <!-- Siguiente -->
+            <button type="button" class="btn btn-outline-light js-page"
+              th:classappend="${areasPage.last} ? ' disabled' : ''" th:attr="data-page=${areasPage.number + 1}">
+              <i class="fa fa-angle-right"></i>
+            </button>
+
+            <!-- Último -->
+            <button type="button" class="btn btn-outline-light js-page"
+              th:classappend="${areasPage.last} ? ' disabled' : ''" th:attr="data-page=${areasPage.totalPages - 1}">
+              <i class="fa fa-angle-double-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

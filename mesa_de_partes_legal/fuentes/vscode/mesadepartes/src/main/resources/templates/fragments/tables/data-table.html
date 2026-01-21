@@ -1,0 +1,70 @@
+<th:block xmlns:th="http://www.thymeleaf.org" th:fragment="data-table(data, columns, title, createUrl, exportUrl)">
+    <!-- Header con búsqueda y acciones -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="mb-0" th:text="${title}">Listado</h4>
+        <div class="d-flex gap-2">
+            <!-- Búsqueda -->
+            <form th:action="${currentUrl}" method="get" class="d-flex">
+                <div class="input-group">
+                    <span class="input-group-text bg-dark text-light border-secondary">
+                        <i class="fa fa-search"></i>
+                    </span>
+                    <input type="text"
+                           name="search"
+                           class="form-control form-control-dark"
+                           placeholder="Buscar..."
+                           th:value="${param.search}">
+                    <button class="btn btn-secondary" type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                    <a th:if="${param.search}"
+                       th:href="${currentUrl}"
+                       class="btn btn-outline-light">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </form>
+
+            <!-- Botones de acción -->
+            <div class="d-flex gap-2">
+                <a th:if="${createUrl}" th:href="${createUrl}" class="btn btn-primary">
+                    <i class="fa fa-plus me-1"></i> Nuevo
+                </a>
+                <a th:if="${exportUrl}" th:href="${exportUrl}" class="btn btn-success">
+                    <i class="fa fa-file-excel me-1"></i> Exportar
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de datos -->
+    <div class="card card-dark">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th th:each="column : ${columns}" th:text="${column.title}">Columna</th>
+                            <th class="text-center" style="width: 120px;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.isEmpty(data)}">
+                            <td th:attr="colspan=${#lists.size(columns) + 1}" class="text-center text-muted py-4">
+                                <i class="fa fa-inbox fa-3x mb-3 d-block"></i>
+                                No hay registros encontrados
+                                <span th:if="${param.search}">
+                                    que coincidan con "<strong th:text="${param.search}"></strong>"
+                                </span>
+                            </td>
+                        </tr>
+                        <!-- Las filas específicas se incluirán aquí -->
+                        <th:block th:fragment="rows">
+                            <!-- Las páginas específicas deben sobreescribir esto -->
+                        </th:block>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</th:block>

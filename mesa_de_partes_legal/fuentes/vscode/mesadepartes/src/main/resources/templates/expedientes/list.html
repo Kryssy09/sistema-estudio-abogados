@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/base}"
+      th:with="activeMenu='expedientes'">
+
+<head>
+    <title>Bandeja de Expedientes</title>
+</head>
+
+<body>
+    <div layout:fragment="content">
+        <!-- Page Header -->
+        <div th:replace="~{fragments/page-header :: page-header-simple('Bandeja de Expedientes')}"></div>
+
+        <!-- Barra de BÚSQUEDA y botones -->
+        <div class="card card-dark mb-3">
+            <div class="card-body">
+                <form th:action="@{/expedientes}" method="get" class="row g-3">
+                    <div class="col-md-10">
+                        <div class="input-group">
+                            <span class="input-group-text bg-dark text-light border-secondary">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input type="text"
+                                   name="search"
+                                   class="form-control form-control-dark"
+                                   placeholder="Buscar por código de seguimiento, solicitante, tipo..."
+                                   th:value="${param.search}">
+                            <button class="btn btn-secondary" type="submit">
+                                <i class="fa fa-search me-1"></i> Buscar
+                            </button>
+                            <a th:href="@{/expedientes}"
+                               class="btn btn-outline-light"
+                               th:if="${param.search}">
+                                <i class="fa fa-times me-1"></i> Limpiar
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <a th:href="@{/expedientes/crear}" class="btn btn-primary w-100">
+                            <i class="fa fa-plus me-1"></i> Nuevo Expediente
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tabla de expedientes ----------->
+        <div class="card card-dark">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Código Seguimiento</th>
+                                <th>Solicitante</th>
+                                <th>Tipo</th>
+                                <th>Area Asignada</th>
+                                <th>Especialista Asignado</th>
+                                <th>Estado</th>
+                                <th>Fecha Creación</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="expediente : ${expedientes}">
+                                <td th:text="${expediente.idExpediente}">1</td>
+                                <td th:text="${expediente.codigoSeguimiento}">EXP-001</td>
+                                <td th:text="${expediente.personaSolicitante.persona.apellidoPaterno + ' ' + expediente.personaSolicitante.persona.apellidoMaterno + ', ' + expediente.personaSolicitante.persona.nombres}">
+                                    Solicitante
+                                </td>
+                                <td>
+                                    <span class="badge bg-info"
+                                          th:text="${expediente.tipoExpediente == 'CON' ? 'Conciliación' : 'Patrocinio Legal'}">
+                                        CON
+                                    </span>
+                                </td>
+                                <td th:text="'No Asignada'">Legal</td>
+                                <td th:text="${expediente.usuarioAsignado != null ? expediente.usuarioAsignado.persona.apellidoPaterno + ' ' + expediente.usuarioAsignado.persona.apellidoMaterno + ', ' + expediente.usuarioAsignado.persona.nombres : 'Sin Asignar'}">
+                                    Sin Asignar
+                                </td>
+                                <td>
+                                    <span class="badge"
+                                          th:classappend="${expediente.estadoExpediente == 'CERR' ? 'bg-primary' :
+                                                          expediente.estadoExpediente == 'ASIG' ? 'bg-info' :
+                                                          expediente.estadoExpediente == 'EN_ATE' ? 'bg-success' :
+                                                          expediente.estadoExpediente == 'ANUL' ? 'bg-warning' : 'bg-secondary'}"
+                                          th:text="${expediente.estadoExpediente == 'CERR' ? 'Cerrado' :
+                                                          expediente.estadoExpediente == 'ASIG' ? 'Asignado' :
+                                                          expediente.estadoExpediente == 'EN_ATE' ? 'En Atención' :
+                                                          expediente.estadoExpediente == 'ANUL' ? 'Anulado' : 'Sin Asignar'}">
+                                        Activo
+                                    </span>
+                                </td>
+                                <td th:text="${#dates.format(expediente.fechaCreacion, 'dd/MM/yyyy HH:mm')}">
+                                    01/01/2024
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group" role="group">
+                                        <a th:href="@{/expedientes/editar/{id}(id=${expediente.idExpediente})}"
+                                           class="btn btn-sm btn-outline-warning"
+                                           title="Editar">
+                                            <i class="fa fa-pencil"></i>
+                                        </a>
+                                        <a th:href="@{/expedientes/exportar/{id}(id=${expediente.idExpediente})}"
+                                           class="btn btn-sm btn-outline-success"
+                                           title="Exportar PDF">
+                                            <i class="fa fa-file-pdf"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${expedientes.empty}">
+                                <td colspan="9" class="text-center text-muted py-4">
+                                    <i class="fa fa-inbox fa-3x mb-3 d-block"></i>
+                                    No hay expedientes registrados
+                                    <span th:if="${param.search}">
+                                        que coincidan con "<strong th:text="${param.search}"></strong>"
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Paginación -->
+        <nav aria-label="Paginación de expedientes" class="mt-3 d-flex justify-content-center">
+            <ul class="pagination pagination-dark">
+                <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                    <a class="page-link"
+                       th:href="@{/expedientes(page=${currentPage - 1}, search=${param.search})}"
+                       aria-label="Anterior">
+                        <span aria-hidden="true">&laquo; Anterior</span>
+                    </a>
+                </li>
+
+                <li class="page-item"
+                    th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                    th:classappend="${i == currentPage} ? 'active'">
+                    <a class="page-link"
+                       th:href="@{/expedientes(page=${i}, search=${param.search})}"
+                       th:text="${i + 1}">1</a>
+                </li>
+
+                <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
+                    <a class="page-link"
+                       th:href="@{/expedientes(page=${currentPage + 1}, search=${param.search})}"
+                       aria-label="Siguiente">
+                        <span aria-hidden="true">Siguiente &raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Información de paginación -->
+        <div class="text-center text-muted small mt-2" th:if="${!expedientes.empty}">
+            Mostrando página <strong th:text="${currentPage + 1}">1</strong> de <strong th:text="${totalPages}">1</strong>
+            (<strong th:text="${expedientes.size()}">0</strong> expedientes en esta página)
+        </div>
+    </div>
+</body>
+</html>

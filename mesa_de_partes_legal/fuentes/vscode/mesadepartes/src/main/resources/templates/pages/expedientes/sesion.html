@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/administrador}">
+<head>
+    <title>Editar Sesión</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <!-- DETALLES DE LA SESION -->
+        <section id="section-detalles-sesion" class="section">
+            <div class="d-flex align-items-center mb-3">
+                <a th:href="@{/expedientes/editar}" class="btn btn-outline-secondary me-3"><i class="fa fa-arrow-left"></i> Atrás</a>
+                <h3 class="mb-0">Editar Sesión</h3>
+            </div>
+          <div class="card card-dark">
+            <div class="card-body">
+              <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                  <label class="form-label">Cód. Seguimiento Expediente</label>
+                  <input type="text" class="form-control form-control-dark" th:value="${expediente.codigoSeguimiento}" disabled>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Estado del Expediente</label>
+                  <select class="form-select form-select-dark" name="estadoExpediente">
+                    <option th:each="estado : ${T(pe.com.mesadepartes.enums.EstadoExpediente).values()}"
+                            th:value="${estado}"
+                            th:text="${estado.displayName}"
+                            th:selected="${estado == expediente.estado}">Iniciado</option>
+                  </select>
+                </div>
+              </div>
+              <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                  <label class="form-label">Número de Sesión</label>
+                  <input type="text" class="form-control form-control-dark" th:value="${sesion.numeroSesion}" disabled>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Fecha de Sesión</label>
+                  <input type="datetime-local" class="form-control form-control-dark" name="fechaSesion" th:value="${#temporals.format(sesion.fechaSesion, 'yyyy-MM-dd''T''HH:mm')}">
+                </div>
+              </div>
+              <div class="row g-3 mb-3">
+                <div class="col-12">
+                  <label class="form-label">Detalles de Sesión</label>
+                  <textarea class="form-control form-control-dark" name="detallesSesion" rows="4" th:text="${sesion.detalles}"></textarea>
+                </div>
+              </div>
+              <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">Resolución</label>
+                  <select class="form-select form-select-dark" name="resolucion">
+                    <option th:each="resolucion : ${T(pe.com.mesadepartes.enums.Resolucion).values()}"
+                            th:value="${resolucion}"
+                            th:text="${resolucion.displayName}"
+                            th:selected="${resolucion == sesion.resolucion}">Acuerdo Total</option>
+                  </select>
+                </div>
+              </div>
+              <hr class="border-light mt-4">
+              <div class="d-flex justify-content-start flex-wrap gap-2 mt-3">
+                <button class="btn btn-secondary" id="btnAdjuntarDoc"><i class="fa fa-upload me-1"></i> Adjuntar Documento</button>
+                <button class="btn btn-success"><i class="fa fa-save me-1"></i> Guardar</button>
+                <button class="btn btn-primary"><i class="fa fa-file-signature me-1"></i> Generar Acta</button>
+                <button class="btn btn-info"><i class="fa fa-file-arrow-up me-1"></i> Cargar Acta Firmada</button>
+                <a th:href="@{/expedientes/editar}" class="btn btn-danger"><i class="fa fa-times me-1"></i> Cerrar</a>
+              </div>
+            </div>
+          </div>
+        </section>
+    </div>
+</body>
+</html>

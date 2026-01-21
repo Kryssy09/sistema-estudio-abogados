@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/base}"
+      th:with="activeMenu='expedientes'">
+
+<head>
+    <title th:text="${isEdit} ? 'Editar Expediente' : 'Crear Expediente'">Expediente</title>
+</head>
+
+<body>
+<div layout:fragment="content">
+
+    <!-- ================= HEADER ================= -->
+    <div th:replace="~{fragments/page-header :: page-header(
+            ${isEdit ? 'Editar Expediente' : 'Crear Expediente'},
+            true,
+            '/expedientes')}">
+    </div>
+
+    <!-- ================= FORMULARIO ================= -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+                <i class="fa fa-file-alt me-2"></i>
+                <span th:text="${isEdit} ? 'Editar Expediente' : 'Crear Expediente'"></span>
+            </h5>
+        </div>
+
+        <div class="card-body">
+            <form method="post"
+                  enctype="multipart/form-data"
+                  th:object="${form}"
+                  th:action="${isEdit} ? '/expedientes/editar/' + ${expediente.idExpediente} : '/expedientes/crear'">
+
+                <div class="row g-3">
+
+                    <!-- Código de seguimiento -->
+                    <div class="col-md-4" th:if="${isEdit}">
+                        <label class="form-label">Cód. Seguimiento</label>
+                        <input class="form-control" readonly th:value="${expediente.codigoSeguimiento}">
+                    </div>
+
+                    <!-- Estado -->
+                    <div class="col-md-4" th:if="${isEdit}">
+                        <label class="form-label">Estado</label>
+                        <input class="form-control" readonly th:value="${estadoLabel}">
+                    </div>
+
+                    <input type="hidden" name="estado" value="SIN_ASIG" th:if="${!isEdit}"/>
+
+                    <!-- Fecha asignación -->
+                    <div class="col-md-4" th:if="${isEdit}">
+                        <label class="form-label">Fecha de Asignación</label>
+                        <input class="form-control" readonly
+                               th:value="${expediente.fechaAsignacion != null
+                               ? #dates.format(expediente.fechaAsignacion,'dd/MM/yyyy HH:mm')
+                               : 'Sin registro'}">
+                    </div>
+
+                    <!-- Tipo expediente -->
+                    <div class="col-12">
+                        <label class="form-label d-block">Tipo</label>
+                        <div class="d-flex gap-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio"
+                                       id="tipoCON" name="tipoExpediente" value="CON"
+                                       th:checked="${!isEdit or expediente.tipoExpediente=='CON'}">
+                                <label class="form-check-label" for="tipoCON">Conciliación</label>
+                            </div>
+
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio"
+                                       id="tipoPL" name="tipoExpediente" value="PL"
+                                       th:checked="${isEdit and expediente.tipoExpediente=='PL'}">
+                                <label class="form-check-label" for="tipoPL">Patrocinio Legal</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mutuo acuerdo -->
+                    <div class="col-md-4">
+                        <label class="form-label d-block">¿De Mutuo Acuerdo?</label>
+                        <div class="d-flex gap-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio"
+                                       id="maSi" name="mutuoAcuerdo" value="true"
+                                       th:checked="${!isEdit or expediente.mutuoAcuerdo}">
+                                <label class="form-check-label" for="maSi">Sí</label>
+                            </div>
+
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio"
+                                       id="maNo" name="mutuoAcuerdo" value="false"
+                                       th:checked="${isEdit and !expediente.mutuoAcuerdo}">
+                                <label class="form-check-label" for="maNo">No</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Especialidad -->
+                    <div class="col-md-4">
+                        <label class="form-label">Especialidad</label>
+                        <select class="form-select" name="especialidadId" required
+                                th:disabled="${isEdit}">
+                            <option value="" disabled selected>Seleccione...</option>
+                            <option th:each="i : ${#numbers.sequence(1,8)}"
+                                    th:value="${i}"
+                                    th:selected="${isEdit and expediente.especialidad == i}">
+                                [[${i}]]
+                            </option>
+                        </select>
+                    </div>
+
+                    <!-- Solicitante -->
+                    <div class="col-md-8">
+                        <label class="form-label">Solicitante</label>
+                        <div class="input-group">
+                            <input type="hidden" id="solicitanteId" name="solicitanteId"
+                                   th:value="${isEdit ? expediente.personaSolicitante.idSolicitante : ''}">
+                            <input class="form-control" readonly
+                                   id="solicitanteNombre"
+                                   placeholder="Seleccione un solicitante..."
+                                   th:value="${isEdit ?
+                                   expediente.personaSolicitante.persona.apellidoPaterno + ' ' +
+                                   expediente.personaSolicitante.persona.apellidoMaterno + ' ' +
+                                   expediente.personaSolicitante.persona.nombres : ''}">
+                            <button class="btn btn-outline-secondary"
+                                    type="button" th:if="${!isEdit}"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#buscarSolicitanteModal"
+                                    aria-label="Buscar solicitante">
+                                <i class="fa fa-search"></i>
+                            </button>
+                            <button class="btn btn-outline-primary"
+                                    type="button" th:if="${!isEdit}"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#crearSolicitanteModal"
+                                    aria-label="Nuevo solicitante">
+                                <i class="fa fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Archivo -->
+                    <div class="col-md-6">
+                        <label class="form-label">Formato de Solicitud</label>
+
+                        <div th:if="${isEdit and expediente.rutaArchivoFormatoSolicitud != null}">
+                            <a class="btn btn-outline-primary"
+                               th:href="@{/files/{p}(p=${expediente.rutaArchivoFormatoSolicitud})}"
+                               download>
+                                <i class="fa fa-download"></i> Descargar
+                            </a>
+                        </div>
+
+                        <div th:if="${!isEdit}">
+                            <input type="file" class="form-control"
+                                   name="formatoArchivo"
+                                   accept=".pdf,.doc,.docx">
+                            <div class="form-text">PDF, DOC, DOCX</div>
+                        </div>
+                    </div>
+
+                    <!-- Reseña -->
+                    <div class="col-12">
+                        <label class="form-label">
+                            Reseña de la Solicitud <span class="text-danger">*</span>
+                        </label>
+                        <textarea class="form-control" rows="4"
+                                  name="reseniaSolicitud"
+                                  required
+                                  th:readonly="${isEdit}"
+                                  th:text="${isEdit ? expediente.reseniaSolicitud : ''}">
+                        </textarea>
+                    </div>
+                </div>
+
+                <!-- BOTONES -->
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <a th:href="@{/expedientes}" class="btn btn-outline-secondary">
+                        <i class="fa fa-times me-1"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa fa-save me-1"></i>
+                        <span th:text="${isEdit} ? 'Actualizar' : 'Crear'"></span>
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- SCRIPTS -->
+<th:block layout:fragment="scripts">
+    <script th:src="@{/js/expedientes.js}"></script>
+</th:block>
+
+</body>
+</html>
