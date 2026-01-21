@@ -58,9 +58,9 @@ Uso de:
     
 ## Equipo de Trabajo
 - Moreno Medina, Krystel Victoria - U22214055
-- Espinoza Castillo, Angeles Krysthel - U22209468
+--Espinoza Castillo, Angeles Krysthel - U22209468
 - De la Torre Ugarte Ibañez, Jose Eduardo - U22208186
-
+. Rodriguez Chacaliaza, Airton Clides - U22205517
 
 
 Carrera: Ingeniería de Sistemas e Informática
