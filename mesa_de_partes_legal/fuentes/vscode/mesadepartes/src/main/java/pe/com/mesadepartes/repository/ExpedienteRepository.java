@@ -1,16 +1,17 @@
 package pe.com.mesadepartes.repository;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
 import pe.com.mesadepartes.entity.Expediente;
 import pe.com.mesadepartes.entity.Solicitante;
-
-import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface ExpedienteRepository extends JpaRepository<Expediente, Integer> {
@@ -55,4 +56,6 @@ public interface ExpedienteRepository extends JpaRepository<Expediente, Integer>
 
   // Método para contar expedientes por estado
   long countByEstadoExpediente(String estadoExpediente);
+
+
 }

@@ -1,359 +1,202 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-    layout:decorate="~{layouts/base}" th:with="activeMenu='expedientes'">
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/base}"
+      th:with="activeMenu='expedientes'">
 
 <head>
-    <title th:text="${isEdit ? 'Editar Expediente' : 'Crear Expediente'}">Expediente</title>
+    <title th:text="${isEdit} ? 'Editar Expediente' : 'Crear Expediente'">Expediente</title>
 </head>
 
 <body>
-    <div layout:fragment="content">
-        <!-- Page Header -->
-        <div
-            th:replace="~{fragments/page-header :: page-header(${isEdit ? 'Editar Expediente' : 'Crear Expediente'}, true, '/expedientes')}">
-        </div>
+<div layout:fragment="content">
 
-        <!-- Formulario Principal -->
-        <div class="card shadow-sm">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">
-                    <i class="fa fa-file-alt me-2"></i>
-                    <span th:text="${isEdit ? 'Editar Expediente' : 'Crear Expediente'}">Expediente</span>
-                </h5>
-            </div>
-            <div class="card-body">
-                <form th:action="${isEdit ? '/expedientes/editar/' + expediente.idExpediente : '/expedientes/crear'}"
-                    method="post" th:object="${form}" enctype="multipart/form-data">
-
-                    <!-- Campos del formulario -->
-                    <div class="row g-3">
-                        <!-- Campo de solo lectura: Código de seguimiento (solo en edición) -->
-                        <div class="col-12 col-md-4" th:if="${isEdit}">
-                            <label class="form-label">Cód. Seguimiento</label>
-                            <input class="form-control" readonly th:value="${expediente.codigoSeguimiento}">
-                        </div>
-
-                        <!-- Estado (select en edición, hidden en creación) -->
-                        <div class="col-12 col-md-4" th:if="${isEdit}">
-                            <label class="form-label">Estado</label>
-                            <input class="form-control" readonly th:value="${estadoLabel}">
-                        </div>
-                        <div class="col-12 col-md-4" th:if="${!isEdit}">
-                            <input type="hidden" name="estado" value="SIN_ASIG">
-                        </div>
-
-                        <!-- Fecha de asignación (solo en edición) -->
-                        <div class="col-12 col-md-4" th:if="${isEdit}">
-                            <label class="form-label">Fecha de Asignación</label>
-                            <input class="form-control" readonly
-                                th:value="${expediente.fechaAsignacion != null ?
-                                            #dates.format(expediente.fechaAsignacion, 'dd/MM/yyyy HH:mm') : 'Sin registro'}">
-                        </div>
-
-                        <!-- Tipo de expediente -->
-                        <div class="col-12">
-                            <label class="form-label d-block">Tipo</label>
-                            <div class="d-flex gap-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="tipoExpediente" value="CON"
-                                        th:checked="${isEdit ? (expediente.tipoExpediente=='CON') : true}" id="tCON">
-                                    <label class="form-check-label" for="tCON">Conciliación</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="tipoExpediente" value="PL"
-                                        th:checked="${isEdit ? (expediente.tipoExpediente=='PL') : false}" id="tPL">
-                                    <label class="form-check-label" for="tPL">Patrocinio Legal</label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- ¿De Mutuo Acuerdo? -->
-                        <div class="col-12 col-md-4">
-                            <label class="form-label d-block">¿De Mutuo Acuerdo?</label>
-                            <div class="d-flex gap-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="mutuoAcuerdo" value="true"
-                                        th:checked="${isEdit ? (expediente.mutuoAcuerdo==true) : true}" id="maSi">
-                                    <label class="form-check-label" for="maSi">Sí</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="mutuoAcuerdo" value="false"
-                                        th:checked="${isEdit ? (expediente.mutuoAcuerdo==false) : false}" id="maNo">
-                                    <label class="form-check-label" for="maNo">No</label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Especialidad -->
-                        <div class="col-12 col-md-4">
-                            <label class="form-label">Especialidad</label>
-                            <select class="form-select" name="especialidadId" required th:disabled="${isEdit}">
-                                <option value="" disabled selected>Seleccione...</option>
-                                <option value="1" th:selected="${isEdit ? expediente.especialidad == 1 : false}">
-                                    Conciliacion Familia</option>
-                                <option value="2" th:selected="${isEdit ? expediente.especialidad == 2 : false}">
-                                    Conciliacion Civil</option>
-                                <option value="3" th:selected="${isEdit ? expediente.especialidad == 3 : false}">PL -
-                                    Derecho Civil</option>
-                                <option value="4" th:selected="${isEdit ? expediente.especialidad == 4 : false}">PL -
-                                    Derecho Penal</option>
-                                <option value="5" th:selected="${isEdit ? expediente.especialidad == 5 : false}">PL -
-                                    Derecho Laboral</option>
-                                <option value="6" th:selected="${isEdit ? expediente.especialidad == 6 : false}">PL -
-                                    Contrataciones con el Estado</option>
-                                <option value="7" th:selected="${isEdit ? expediente.especialidad == 7 : false}">PL -
-                                    Derecho Administrativo</option>
-                                <option value="8" th:selected="${isEdit ? expediente.especialidad == 8 : false}">PL -
-                                    Derecho Tributario</option>
-                            </select>
-                        </div>
-
-                        <!-- Solicitante -->
-                        <div class="col-12 col-md-8">
-                            <label class="form-label">Solicitante</label>
-                            <div class="input-group">
-                                <input type="hidden" name="solicitanteId" id="solicitanteId"
-                                    th:value="${isEdit ? expediente.personaSolicitante.idSolicitante : ''}">
-                                <input type="text" class="form-control" id="solicitanteNombre"
-                                    placeholder="Seleccione un solicitante..." readonly
-                                    th:value="${isEdit ? expediente.personaSolicitante.persona.apellidoPaterno + ' ' + expediente.personaSolicitante.persona.apellidoMaterno + ' ' + expediente.personaSolicitante.persona.nombres : ''}">
-                                <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal"
-                                    data-bs-target="#buscarSolicitanteModal" th:if="${!isEdit}">
-                                    <i class="fa fa-search"></i>
-                                </button>
-                                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal"
-                                    data-bs-target="#crearSolicitanteModal" th:if="${!isEdit}">
-                                    <i class="fa fa-plus"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Formato de solicitud -->
-                        <div class="col-12 col-md-6">
-                            <label class="form-label">Formato de Solicitud</label>
-                            <div th:if="${isEdit and expediente.rutaArchivoFormatoSolicitud != null}">
-                                <a class="btn btn-outline-primary"
-                                    th:href="@{/files/{p}(p=${expediente.rutaArchivoFormatoSolicitud})}" download>
-                                    <i class="fa fa-download"></i> Descargar
-                                </a>
-                            </div>
-                            <div th:if="${!isEdit}">
-                                <input type="file" class="form-control" name="formatoArchivo" accept=".pdf,.doc">
-                                <div class="form-text">Formatos permitidos: PDF, DOC/DOCX</div>
-                            </div>
-                        </div>
-
-                        <!-- Reseña -->
-                        <div class="col-12">
-                            <label class="form-label">Reseña de la Solicitud <span class="text-danger">*</span></label>
-                            <textarea class="form-control" name="reseniaSolicitud" rows="4" required
-                                th:text="${isEdit ? expediente.reseniaSolicitud : ''}" th:readonly="${isEdit}"
-                                placeholder="Describa brevemente la solicitud..."></textarea>
-                        </div>
-                    </div>
-
-                    <!-- Sesiones del Expediente -->
-                    <div th:if="${isEdit}" class="card shadow-sm mt-4">
-                        <div
-                            class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">
-                                <i class="fa fa-calendar-alt me-2"></i>
-                                Sesiones del Expediente
-                            </h5>
-                            <a th:href="@{/expedientes/{id}/sesiones/nueva(id=${expediente.idExpediente})}"
-                                class="btn btn-sm btn-light">
-                                <i class="fa fa-plus me-1"></i> Nueva Sesión
-                            </a>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>Nro. Sesión</th>
-                                            <th>Fecha Programada</th>
-                                            <th>Estado</th>
-                                            <th>Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr th:each="sesion : ${sesiones}">
-                                            <td th:text="${sesion.secuencia}"></td>
-                                            <td th:text="${#temporals.format(sesion.fechaSesion, 'dd/MM/yyyy HH:mm')}">
-                                            </td>
-                                            <td><span class="badge"
-                                                    th:classappend="${sesion.estadoSesion == 'Realizada' ? 'bg-success' : (sesion.estadoSesion == 'Programada' ? 'bg-warning' : 'bg-danger')}"
-                                                    th:text="${sesion.estadoSesion}"></span></td>
-                                            <td>
-                                                <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal"
-                                                    data-bs-target="#verSesionModal"
-                                                    th:attr="data-nrosesion=${sesion.secuencia}, data-fecha=${#temporals.format(sesion.fechaSesion, 'dd-MM-yyyy HH:mm')}, data-estado=${sesion.estadoSesion}, data-resumen=${#strings.escapeXml(sesion.detallesSesion)}">
-                                                    <i class="fa fa-eye"></i>
-                                                </button>
-                                                <a th:href="@{/expedientes/sesiones/{id}/editar(id=${sesion.idExpedienteSesion})}"
-                                                    class="btn btn-sm btn-primary">
-                                                    <i class="fa fa-edit"></i>
-                                                </a>
-                                                <button type="button" class="btn btn-sm btn-danger"
-                                                    th:data-id="${sesion.idExpedienteSesion}"
-                                                    onclick="deleteSesion(this)">
-                                                    <i class="fa fa-trash"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Botones de acción -->
-                    <div class="d-flex justify-content-end gap-2 mt-4">
-                        <a th:href="@{/expedientes}" class="btn btn-outline-secondary">
-                            <i class="fa fa-times me-1"></i> Cancelar
-                        </a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fa fa-save me-1"></i>
-                            <span th:text="${isEdit ? 'Actualizar' : 'Crear'}">Guardar</span>
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- Modal para buscar solicitante -->
-        <div class="modal fade" id="buscarSolicitanteModal" tabindex="-1">
-            <div class="modal-dialog modal-lg modal-dialog-scrollable">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Buscar Solicitante</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="input-group mb-3">
-                            <input type="text" class="form-control" id="inputBuscarSolicitante"
-                                placeholder="Ingrese nombre o DNI...">
-                            <button class="btn btn-primary" type="button" id="btnBuscarSolicitante">
-                                <i class="fa fa-search"></i> Buscar
-                            </button>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-hover table-bordered" id="tablaResultadosSolicitantes">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Documento</th>
-                                        <th>Nombre Completo</th>
-                                        <th>Acción</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Resultados vía AJAX -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modal para crear solicitante -->
-        <div class="modal fade" id="crearSolicitanteModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Nuevo Solicitante</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="formCrearSolicitante">
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">Tipo Documento</label>
-                                    <select class="form-select" name="tipoDocumento" required>
-                                        <option value="DNI">DNI</option>
-                                        <option value="CE">Carnet Extranjería</option>
-                                        <option value="RUC">RUC</option>
-                                        <option value="PASAPORTE">Pasaporte</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Nro. Documento</label>
-                                    <input type="text" class="form-control" name="numeroDocumento" required>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label">Nombres</label>
-                                    <input type="text" class="form-control" name="nombres" required>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label">Ap. Paterno</label>
-                                    <input type="text" class="form-control" name="apellidoPaterno" required>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label">Ap. Materno</label>
-                                    <input type="text" class="form-control" name="apellidoMaterno" required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Email</label>
-                                    <input type="email" class="form-control" name="email">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Teléfono</label>
-                                    <input type="text" class="form-control" name="telefono">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Sexo</label>
-                                    <select class="form-select" name="sexo">
-                                        <option value="M">Masculino</option>
-                                        <option value="F">Femenino</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="button" class="btn btn-primary" id="btnGuardarSolicitante">Guardar</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modal para ver sesión -->
-        <div class="modal fade" id="verSesionModal" tabindex="-1">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Detalles de la Sesión</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <p><strong>Nro. de Sesión:</strong> <span id="verNroSesion"></span></p>
-                                <p><strong>Fecha Programada:</strong> <span id="verFechaProgramada"></span></p>
-                            </div>
-                            <div class="col-md-6">
-                                <p><strong>Estado:</strong> <span id="verEstadoSesion"></span></p>
-                            </div>
-                        </div>
-                        <hr>
-                        <div>
-                            <h6>Resumen de la Sesión</h6>
-                            <p id="verResumenSesion"></p>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <!-- ================= HEADER ================= -->
+    <div th:replace="~{fragments/page-header :: page-header(
+            ${isEdit ? 'Editar Expediente' : 'Crear Expediente'},
+            true,
+            '/expedientes')}">
     </div>
 
-    <!-- Scripts específicos de la página -->
-    <th:block layout:fragment="scripts">
-        <script th:src="@{/js/expedientes.js}"></script>
-    </th:block>
-</body>
+    <!-- ================= FORMULARIO ================= -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+                <i class="fa fa-file-alt me-2"></i>
+                <span th:text="${isEdit} ? 'Editar Expediente' : 'Crear Expediente'"></span>
+            </h5>
+        </div>
 
+        <div class="card-body">
+            <form method="post"
+                  enctype="multipart/form-data"
+                  th:object="${form}"
+                  th:action="${isEdit} ? '/expedientes/editar/' + ${expediente.idExpediente} : '/expedientes/crear'">
+
+                <div class="row g-3">
+
+                    <!-- Código de seguimiento -->
+                    <div class="col-md-4" th:if="${isEdit}">
+                        <label class="form-label">Cód. Seguimiento</label>
+                        <input class="form-control" readonly th:value="${expediente.codigoSeguimiento}">
+                    </div>
+
+                    <!-- Estado -->
+                    <div class="col-md-4" th:if="${isEdit}">
+                        <label class="form-label">Estado</label>
+                        <input class="form-control" readonly th:value="${estadoLabel}">
+                    </div>
+
+                    <input type="hidden" name="estado" value="SIN_ASIG" th:if="${!isEdit}"/>
+
+                    <!-- Fecha asignación -->
+                    <div class="col-md-4" th:if="${isEdit}">
+                        <label class="form-label">Fecha de Asignación</label>
+                        <input class="form-control" readonly
+                               th:value="${expediente.fechaAsignacion != null
+                               ? #dates.format(expediente.fechaAsignacion,'dd/MM/yyyy HH:mm')
+                               : 'Sin registro'}">
+                    </div>
+
+                    <!-- Tipo expediente -->
+                    <div class="col-12">
+                        <label class="form-label d-block">Tipo</label>
+                        <div class="d-flex gap-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio"
+                                       id="tipoCON" name="tipoExpediente" value="CON"
+                                       th:checked="${!isEdit or expediente.tipoExpediente=='CON'}">
+                                <label class="form-check-label" for="tipoCON">Conciliación</label>
+                            </div>
+
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio"
+                                       id="tipoPL" name="tipoExpediente" value="PL"
+                                       th:checked="${isEdit and expediente.tipoExpediente=='PL'}">
+                                <label class="form-check-label" for="tipoPL">Patrocinio Legal</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mutuo acuerdo -->
+                    <div class="col-md-4">
+                        <label class="form-label d-block">¿De Mutuo Acuerdo?</label>
+                        <div class="d-flex gap-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio"
+                                       id="maSi" name="mutuoAcuerdo" value="true"
+                                       th:checked="${!isEdit or expediente.mutuoAcuerdo}">
+                                <label class="form-check-label" for="maSi">Sí</label>
+                            </div>
+
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio"
+                                       id="maNo" name="mutuoAcuerdo" value="false"
+                                       th:checked="${isEdit and !expediente.mutuoAcuerdo}">
+                                <label class="form-check-label" for="maNo">No</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Especialidad -->
+                    <div class="col-md-4">
+                        <label class="form-label">Especialidad</label>
+                        <select class="form-select" name="especialidadId" required
+                                th:disabled="${isEdit}">
+                            <option value="" disabled selected>Seleccione...</option>
+                            <option th:each="i : ${#numbers.sequence(1,8)}"
+                                    th:value="${i}"
+                                    th:selected="${isEdit and expediente.especialidad == i}">
+                                [[${i}]]
+                            </option>
+                        </select>
+                    </div>
+
+                    <!-- Solicitante -->
+                    <div class="col-md-8">
+                        <label class="form-label">Solicitante</label>
+                        <div class="input-group">
+                            <input type="hidden" id="solicitanteId" name="solicitanteId"
+                                   th:value="${isEdit ? expediente.personaSolicitante.idSolicitante : ''}">
+                            <input class="form-control" readonly
+                                   id="solicitanteNombre"
+                                   placeholder="Seleccione un solicitante..."
+                                   th:value="${isEdit ?
+                                   expediente.personaSolicitante.persona.apellidoPaterno + ' ' +
+                                   expediente.personaSolicitante.persona.apellidoMaterno + ' ' +
+                                   expediente.personaSolicitante.persona.nombres : ''}">
+                            <button class="btn btn-outline-secondary"
+                                    type="button" th:if="${!isEdit}"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#buscarSolicitanteModal"
+                                    aria-label="Buscar solicitante">
+                                <i class="fa fa-search"></i>
+                            </button>
+                            <button class="btn btn-outline-primary"
+                                    type="button" th:if="${!isEdit}"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#crearSolicitanteModal"
+                                    aria-label="Nuevo solicitante">
+                                <i class="fa fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Archivo -->
+                    <div class="col-md-6">
+                        <label class="form-label">Formato de Solicitud</label>
+
+                        <div th:if="${isEdit and expediente.rutaArchivoFormatoSolicitud != null}">
+                            <a class="btn btn-outline-primary"
+                               th:href="@{/files/{p}(p=${expediente.rutaArchivoFormatoSolicitud})}"
+                               download>
+                                <i class="fa fa-download"></i> Descargar
+                            </a>
+                        </div>
+
+                        <div th:if="${!isEdit}">
+                            <input type="file" class="form-control"
+                                   name="formatoArchivo"
+                                   accept=".pdf,.doc,.docx">
+                            <div class="form-text">PDF, DOC, DOCX</div>
+                        </div>
+                    </div>
+
+                    <!-- Reseña -->
+                    <div class="col-12">
+                        <label class="form-label">
+                            Reseña de la Solicitud <span class="text-danger">*</span>
+                        </label>
+                        <textarea class="form-control" rows="4"
+                                  name="reseniaSolicitud"
+                                  required
+                                  th:readonly="${isEdit}"
+                                  th:text="${isEdit ? expediente.reseniaSolicitud : ''}">
+                        </textarea>
+                    </div>
+                </div>
+
+                <!-- BOTONES -->
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <a th:href="@{/expedientes}" class="btn btn-outline-secondary">
+                        <i class="fa fa-times me-1"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa fa-save me-1"></i>
+                        <span th:text="${isEdit} ? 'Actualizar' : 'Crear'"></span>
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- SCRIPTS -->
+<th:block layout:fragment="scripts">
+    <script th:src="@{/js/expedientes.js}"></script>
+</th:block>
+
+</body>
 </html>
