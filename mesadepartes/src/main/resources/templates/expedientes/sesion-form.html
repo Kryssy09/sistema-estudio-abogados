@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/base}">
+
+<head>
+    <title>Nueva Sesión</title>
+</head>
+
+<body>
+    <div layout:fragment="content">
+        <!-- Page Header -->
+        <div th:replace="~{fragments/page-header :: page-header('Nueva Sesión', true, '/expedientes/editar/' + ${expediente.idExpediente})}"></div>
+
+        <!-- Formulario Principal -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fa fa-calendar-plus me-2"></i>
+                    Nueva Sesión para el Expediente <span th:text="${expediente.codigoSeguimiento}"></span>
+                </h5>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/expedientes/{id}/sesiones(id=${expediente.idExpediente})}"
+                      method="post"
+                      th:object="${sesionForm}"
+                      enctype="multipart/form-data">
+
+                    <!-- Campos del formulario -->
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Estado de la Sesión</label>
+                            <select class="form-select" name="estadoSesion" id="estadoSesion" required>
+                                <option value="Programada">Programada</option>
+                                <option value="En Curso">En Curso</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Fecha de Sesión</label>
+                            <input type="datetime-local" class="form-control" name="fechaSesion" id="fechaSesion" required>
+                        </div>
+                        <div class="col-12" id="detallesSesionContainer">
+                            <label class="form-label" id="detallesSesionLabel">Reseña</label>
+                            <textarea class="form-control" name="detallesSesion" rows="4"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <a th:href="@{/expedientes/editar/{id}(id=${expediente.idExpediente})}" class="btn btn-outline-secondary">
+                            <i class="fa fa-times me-1"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-save me-1"></i> Guardar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <th:block layout:fragment="scripts">
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var estadoSesion = document.getElementById('estadoSesion');
+                var fechaSesion = document.getElementById('fechaSesion');
+                var detallesSesionContainer = document.getElementById('detallesSesionContainer');
+                var detallesSesionLabel = document.getElementById('detallesSesionLabel');
+
+                function toggleFields() {
+                    var now = new Date();
+                    var nowString = now.toISOString().slice(0, 16);
+
+                    if (estadoSesion.value === 'Programada') {
+                        fechaSesion.min = nowString;
+                        fechaSesion.max = '';
+                        detallesSesionContainer.style.display = 'block';
+                        detallesSesionLabel.textContent = 'Reseña';
+                    } else if (estadoSesion.value === 'En Curso') {
+                        fechaSesion.max = nowString;
+                        fechaSesion.min = '';
+                        fechaSesion.value = nowString;
+                        detallesSesionContainer.style.display = 'none';
+                    }
+                }
+
+                estadoSesion.addEventListener('change', toggleFields);
+                toggleFields();
+            });
+        </script>
+    </th:block>
+</body>
+</html>

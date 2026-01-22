@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/base}"
+      th:with="activeMenu='config'">
+
+<head>
+    <title>Configuración</title>
+</head>
+
+<body>
+    <div layout:fragment="content">
+        <!-- Page Header -->
+        <div th:replace="~{fragments/page-header :: page-header-simple('Configuración')}"></div>
+
+        <!-- Configuración General -->
+        <div class="row g-4">
+            <div class="col-xl-8">
+                <!-- Institución -->
+                <div class="card card-dark mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fa fa-building me-2"></i>
+                            Información de la Institución
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form>
+                            <div class="row g-3">
+                                <div class="col-md-12">
+                                    <label class="form-label">Nombre de la Institución</label>
+                                    <input type="text" class="form-control form-control-dark"
+                                           value="IINCADE 4.0 – Mesa de Partes Legal"
+                                           id="configName">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">RUC</label>
+                                    <input type="text" class="form-control form-control-dark"
+                                           placeholder="Ingrese RUC">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Teléfono</label>
+                                    <input type="text" class="form-control form-control-dark"
+                                           placeholder="Ingrese teléfono">
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label">Dirección</label>
+                                    <input type="text" class="form-control form-control-dark"
+                                           placeholder="Ingrese dirección">
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label">Correo Electrónico</label>
+                                    <input type="email" class="form-control form-control-dark"
+                                           placeholder="Ingrese correo electrónico">
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fa fa-save me-1"></i> Guardar Cambios
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Configuración de Sistema -->
+                <div class="card card-dark mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fa fa-cogs me-2"></i>
+                            Configuración de Sistema
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Idioma</label>
+                                <select class="form-select form-control-dark">
+                                    <option value="es" selected>Español</option>
+                                    <option value="en">English</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Zona Horaria</label>
+                                <select class="form-select form-control-dark">
+                                    <option value="America/Lima" selected>Lima (GMT-5)</option>
+                                    <option value="America/Mexico_City">Ciudad de México</option>
+                                    <option value="America/Bogota">Bogotá</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Formato de Fecha</label>
+                                <select class="form-select form-control-dark">
+                                    <option value="dd/MM/yyyy" selected>DD/MM/YYYY</option>
+                                    <option value="MM/dd/yyyy">MM/DD/YYYY</option>
+                                    <option value="yyyy-MM-dd">YYYY-MM-DD</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Moneda</label>
+                                <select class="form-select form-control-dark">
+                                    <option value="PEN" selected>Soles (PEN)</option>
+                                    <option value="USD">Dólares (USD)</option>
+                                    <option value="EUR">Euros (EUR)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preferencias de Usuario -->
+                <div class="card card-dark">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fa fa-user-cog me-2"></i>
+                            Preferencias de Usuario
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="toggleCompact">
+                                    <label class="form-check-label" for="toggleCompact">
+                                        Modo compacto (reduce el espacio entre elementos)
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="toggleNotifications" checked>
+                                    <label class="form-check-label" for="toggleNotifications">
+                                        Habilitar notificaciones del sistema
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="toggleTooltips" checked>
+                                    <label class="form-check-label" for="toggleTooltips">
+                                        Mostrar tooltips de ayuda
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Elementos por página</label>
+                                <select class="form-select form-control-dark">
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                    <option value="50" selected>50</option>
+                                    <option value="100">100</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Tema</label>
+                                <select class="form-select form-control-dark">
+                                    <option value="dark" selected>Tema Oscuro</option>
+                                    <option value="light">Tema Claro</option>
+                                    <option value="auto">Automático</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa fa-save me-1"></i> Guardar Preferencias
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary ms-2">
+                                <i class="fa fa-undo me-1"></i> Restablecer Predeterminados
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-4">
+                <!-- Información del Sistema -->
+                <div class="card card-dark mb-4">
+                    <div class="card-header">
+                        <h6 class="mb-0">Información del Sistema</h6>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-sm table-dark">
+                            <tr>
+                                <td>Versión</td>
+                                <td class="text-end">4.0.1</td>
+                            </tr>
+                            <tr>
+                                <td>Última Actualización</td>
+                                <td class="text-end">21 Nov 2024</td>
+                            </tr>
+                            <tr>
+                                <td>Base de Datos</td>
+                                <td class="text-end">PostgreSQL</td>
+                            </tr>
+                            <tr>
+                                <td>Java Version</td>
+                                <td class="text-end">17+</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Estado del Sistema -->
+                <div class="card card-dark mb-4">
+                    <div class="card-header">
+                        <h6 class="mb-0">Estado del Sistema</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>Base de Datos</span>
+                            <span class="badge bg-success">Conectado</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>Servidor</span>
+                            <span class="badge bg-success">Activo</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>Almacenamiento</span>
+                            <span class="badge bg-warning">75%</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>Memoria</span>
+                            <span class="badge bg-success">Normal</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Acciones Rápidas -->
+                <div class="card card-dark">
+                    <div class="card-header">
+                        <h6 class="mb-0">Acciones Rápidas</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-primary btn-sm">
+                                <i class="fa fa-download me-1"></i> Backup de Datos
+                            </button>
+                            <button class="btn btn-outline-warning btn-sm">
+                                <i class="fa fa-sync me-1"></i> Limpiar Caché
+                            </button>
+                            <button class="btn btn-outline-info btn-sm">
+                                <i class="fa fa-file-alt me-1"></i> Ver Logs
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm">
+                                <i class="fa fa-exclamation-triangle me-1"></i> Diagnóstico
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts específicos de la página -->
+    <th:block layout:fragment="scripts">
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Manejar cambios de configuración
+                const toggleCompact = document.getElementById('toggleCompact');
+                if (toggleCompact) {
+                    toggleCompact.addEventListener('change', function() {
+                        const body = document.body;
+                        if (this.checked) {
+                            body.classList.add('compact-mode');
+                        } else {
+                            body.classList.remove('compact-mode');
+                        }
+                    });
+                }
+
+                // Manejar envío de formularios
+                document.querySelectorAll('form').forEach(form => {
+                    form.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        showToast('Configuración guardada correctamente', 'success');
+                    });
+                });
+
+                // Manejar botones de acciones rápidas
+                document.querySelectorAll('[class*="btn-outline"]').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const text = this.textContent.trim();
+                        showToast('Ejecutando: ' + text, 'info');
+                    });
+                });
+            });
+        </script>
+    </th:block>
+</body>
+</html>

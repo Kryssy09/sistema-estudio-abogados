@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/administrador}">
+<head>
+    <title>Detalle de Expediente</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <!-- EDITAR EXPEDIENTE -->
+        <section id="section-edit-expediente" class="section">
+            <div class="d-flex align-items-center mb-3">
+                <a th:href="@{/expedientes}" class="btn btn-outline-secondary me-3"><i class="fa fa-arrow-left"></i> Atrás</a>
+                <h3 class="mb-0">Detalle de Expediente</h3>
+            </div>
+          <div class="card card-dark">
+            <div class="card-body">
+              <div class="row g-3 align-items-center mb-3">
+                <div class="col-md-4">
+                  <label class="form-label-sm">Cód. Seguimiento Expediente</label>
+                  <input type="text" class="form-control form-control-dark" value="EXP-2024-07-124" disabled>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label-sm">Estado</label>
+                  <input type="text" class="form-control form-control-dark" value="En Atención" disabled>
+                </div>
+              </div>
+
+              <div class="row g-3 align-items-center mb-3">
+                <div class="col-md-auto">
+                  <label class="form-label-sm">Tipo</label>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="tipoExpediente" id="tipoConciliacion" checked>
+                    <label class="form-check-label" for="tipoConciliacion">Conciliación</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="tipoExpediente" id="tipoPatrocinio">
+                    <label class="form-check-label" for="tipoPatrocinio">Patrocinio Legal</label>
+                  </div>
+                </div>
+                <div class="col-md-auto">
+                  <label class="form-label-sm">¿De Mutuo Acuerdo?</label>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="mutuoAcuerdo" id="acuerdoSi">
+                    <label class="form-check-label" for="acuerdoSi">Sí</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="mutuoAcuerdo" id="acuerdoNo" checked>
+                    <label class="form-check-label" for="acuerdoNo">No</label>
+                  </div>
+                </div>
+              </div>
+
+              <hr class="border-light">
+
+              <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">Solicitante</label>
+                  <input type="text" class="form-control form-control-dark" value="Ana María Quispe Rojas">
+                  <button class="btn btn-sm btn-outline-secondary mt-2"><i class="fa fa-download me-1"></i> Ver Formato de Solicitud</button>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Invitado</label>
+                  <input type="text" class="form-control form-control-dark" value="Carlos Alberto Paredes">
+                </div>
+                 <div class="col-md-6">
+                  <label class="form-label">Cód. Expediente de Origen</label>
+                  <div class="input-group">
+                    <input type="text" class="form-control form-control-dark" placeholder="Buscar código...">
+                    <button class="btn btn-secondary" type="button"><i class="fa fa-search"></i></button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row g-3 mb-3">
+                <div class="col-12">
+                  <label class="form-label">Reseña de la Solicitud</label>
+                  <textarea class="form-control form-control-dark" rows="3">La solicitante indica que el invitado, su ex-conviviente, no ha cumplido con los pagos de la pensión alimenticia para su menor hijo en los últimos 3 meses. Se busca llegar a un acuerdo sobre el monto y la regularización de los pagos pendientes.</textarea>
+                </div>
+              </div>
+
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">Especialidad</label>
+                  <select class="form-select form-select-dark">
+                    <option>Civil</option>
+                    <option selected>Familiar</option>
+                    <option>Laboral</option>
+                    <option>Administrativo</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Conciliador Asignado</label>
+                  <input type="text" class="form-control form-control-dark" value="Dr. Luis Alberto García">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Fecha de Asignación</label>
+                  <input type="text" class="form-control form-control-dark" value="28/09/2025 10:30 AM">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Fecha de Notificación Inicial</label>
+                  <input type="text" class="form-control form-control-dark" value="29/09/2025 09:00 AM">
+                </div>
+              </div>
+
+              <hr class="border-light mt-4">
+
+              <div class="d-flex justify-content-start gap-2 mt-3">
+                <button class="btn btn-success"><i class="fa fa-save me-1"></i> Guardar Sesión y Cerrar</button>
+                <a th:href="@{/expedientes/sesion}" class="btn btn-info"><i class="fa fa-list-check me-1"></i> Detalles de la Sesión</a>
+                <button class="btn btn-primary"><i class="fa fa-calendar-plus me-1"></i> Agendar Nueva Sesión</button>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="card card-dark mt-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h5 class="mb-0">Sesiones del Expediente</h5>
+                <a th:href="@{/expedientes/{id}/sesiones/nueva(id=${expediente.idExpediente})}" class="btn btn-sm btn-light">
+                    <i class="fa fa-plus me-1"></i> Nueva Sesión
+                </a>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-dark table-hover mb-0 actions-hover">
+                  <thead>
+                    <tr>
+                      <th>Nro. Sesión</th>
+                      <th>Fecha Programada</th>
+                      <th>Estado</th>
+                      <th class="text-end">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr th:each="sesion : ${sesiones}">
+                        <td th:text="${sesion.secuencia}"></td>
+                        <td th:text="${#temporals.format(sesion.fechaSesion, 'dd/MM/yyyy HH:mm')}"></td>
+                        <td><span class="badge" th:classappend="${sesion.estadoSesion == 'Realizada' ? 'bg-success' : (sesion.estadoSesion == 'Programada' ? 'bg-warning' : 'bg-danger')}" th:text="${sesion.estadoSesion}"></span></td>
+                        <td class="text-end">
+                            <div class="table-actions">
+                                <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#verSesionModal"
+                                        th:attr="data-nrosesion=${sesion.secuencia}, data-fecha=${#temporals.format(sesion.fechaSesion, 'dd/MM/yyyy HH:mm')}, data-estado=${sesion.estadoSesion}, data-resumen=${sesion.detallesSesion}"
+                                        title="Ver">
+                                    <i class="fa fa-eye"></i>
+                                </button>
+                                <a th:href="@{/expedientes/sesiones/{id}/editar(id=${sesion.idExpedienteSesion})}" class="btn btn-sm btn-warning" th:if="${sesion.estadoSesion == 'Programada'}" title="Editar">
+                                    <i class="fa fa-pencil"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-danger" th:data-id="${sesion.idExpedienteSesion}" onclick="deleteSesion(this)" title="Borrar">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Modal para ver sesión -->
+        <div class="modal fade" id="verSesionModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Detalles de la Sesión</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Nro. de Sesión:</strong> <span id="verNroSesion"></span></p>
+                                <p><strong>Fecha Programada:</strong> <span id="verFechaProgramada"></span></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Estado:</strong> <span id="verEstadoSesion"></span></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div>
+                            <h6>Resumen de la Sesión</h6>
+                            <p id="verResumenSesion"></p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts específicos de la página -->
+    <th:block layout:fragment="scripts">
+        <script th:src="@{/js/expedientes.js}"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var verSesionModal = document.getElementById('verSesionModal');
+                verSesionModal.addEventListener('show.bs.modal', function (event) {
+                    var button = event.relatedTarget;
+                    var nroSesion = button.getAttribute('data-nrosesion');
+                    var fecha = button.getAttribute('data-fecha');
+                    var estado = button.getAttribute('data-estado');
+                    var resumen = button.getAttribute('data-resumen');
+
+                    var modalNroSesion = verSesionModal.querySelector('#verNroSesion');
+                    var modalFecha = verSesionModal.querySelector('#verFechaProgramada');
+                    var modalEstado = verSesionModal.querySelector('#verEstadoSesion');
+                    var modalResumen = verSesionModal.querySelector('#verResumenSesion');
+
+                    modalNroSesion.textContent = nroSesion;
+                    modalFecha.textContent = fecha;
+                    modalEstado.textContent = estado;
+                    modalResumen.textContent = resumen;
+                });
+            });
+        </script>
+    </th:block>
+</body>
+</html>

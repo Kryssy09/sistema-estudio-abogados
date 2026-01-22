@@ -1,0 +1,149 @@
+<!-- templates/usuarios/_tabla.html -->
+<div id="usuariosTable" th:fragment="tabla(usuariosPage, q, size)" th:inline="text">
+
+  <form id="stateForm" class="d-none">
+    <input type="hidden" name="page" th:value="${usuariosPage.number}">
+    <input type="hidden" name="size" th:value="${usuariosPage.size}">
+    <input type="hidden" name="q"    th:value="${q}">
+  </form>
+
+  <div class="card">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+          <tr>
+            <th style="width: 46%;">Apellidos y Nombres</th>
+            <th style="width: 26%;">Usuario</th>
+            <th style="width: 14%;">Estado</th>
+            <th class="text-end" style="width: 14%;">Opciones</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="u : ${usuariosPage.content}">
+            <td>
+              <div class="text-truncate"
+                   th:title="${u.apellidoPaterno + ' ' + u.apellidoMaterno + ', ' + u.nombres}">
+                <span th:text="${u.apellidoPaterno}">Paterno</span>
+                <span th:text="${u.apellidoMaterno}">Materno</span>,
+                <span th:text="${u.nombres}">Nombres</span>
+              </div>
+            </td>
+
+            <td><span class="fw-semibold" th:text="${u.username}">username</span></td>
+
+            <td>
+              <span class="badge" th:classappend="${u.activo} ? ' text-bg-success' : ' text-bg-secondary'">
+                <span th:text="${u.activo} ? 'Activo' : 'Inactivo'">Activo</span>
+              </span>
+            </td>
+
+            <td class="text-end">
+              <div class="dropdown">
+                <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="bi bi-three-dots-vertical"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <!-- Activar/Desactivar -->
+                  <li>
+                    <button class="dropdown-item"
+                            th:attr="hx-post=@{|/usuarios/${u.id}/activar|}"
+                            hx-target="#usuariosTable"
+                            hx-swap="outerHTML"
+                            hx-include="#stateForm"
+                            >
+                      <span th:text="${u.activo} ? 'Desactivar' : 'Activar'">Activar</span>
+                    </button>
+                  </li>
+
+                  <!-- Editar -->
+                  <li>
+                    <a class="dropdown-item" th:href="@{|/usuarios/editar/${u.id}|}">Editar</a>
+                  </li>
+
+                  <!-- Eliminar (abre modal en lista.html) -->
+                  <li>
+                    <button class="dropdown-item text-danger js-confirm-delete"
+                            th:attr="data-hx-url=@{|/usuarios/${u.id}|}">
+                      Eliminar
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            </td>
+          </tr>
+
+          <tr th:if="${usuariosPage.content.empty}">
+            <td colspan="4" class="text-center text-secondary py-4">No se encontraron usuarios.</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Paginación -->
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 p-3 border-top">
+        <div class="small text-secondary">
+          <span th:if="${usuariosPage.totalElements > 0}">
+            Mostrando
+            <strong th:text="${usuariosPage.number * usuariosPage.size + 1}">1</strong> –
+            <strong th:text="${usuariosPage.number * usuariosPage.size + usuariosPage.numberOfElements}">10</strong>
+            de <strong th:text="${usuariosPage.totalElements}">0</strong>
+          </span>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+
+          <!-- Page size: vuelve a page=0; mantiene q -->
+          <form class="d-flex align-items-center gap-2"
+                th:attr="hx-post=@{/usuarios}"
+                hx-target="#usuariosTable"
+                hx-swap="outerHTML"
+                hx-include="#stateForm [name='q']"
+                hx-vals='{"page":0}'>
+            <label class="small text-secondary">Por página</label>
+            <select class="form-select form-select-sm" name="size" onchange="this.form.requestSubmit()">
+              <option th:value="5"  th:selected="${usuariosPage.size == 5}">5</option>
+              <option th:value="10" th:selected="${usuariosPage.size == 10}">10</option>
+              <option th:value="20" th:selected="${usuariosPage.size == 20}">20</option>
+              <option th:value="50" th:selected="${usuariosPage.size == 50}">50</option>
+            </select>
+          </form>
+
+          <!-- Controles -->
+          <div class="btn-group btn-group-sm" role="group" aria-label="Paginación">
+  
+            <button type="button" class="btn btn-outline-secondary js-page"
+                    th:classappend="${usuariosPage.first} ? ' disabled' : ''"
+                    data-page="0">
+              <i class="bi bi-chevron-double-left"></i>
+            </button>
+
+            <button type="button" class="btn btn-outline-secondary js-page"
+                    th:classappend="${usuariosPage.first} ? ' disabled' : ''"
+                    th:attr="data-page=${usuariosPage.number - 1}">
+              <i class="bi bi-chevron-left"></i>
+            </button>
+
+            <span class="btn btn-outline-secondary disabled">
+              Página <strong th:text="${usuariosPage.number + 1}">1</strong> /
+              <span th:text="${usuariosPage.totalPages}">1</span>
+            </span>
+
+            <button type="button" class="btn btn-outline-secondary js-page"
+                    th:classappend="${usuariosPage.last} ? ' disabled' : ''"
+                    th:attr="data-page=${usuariosPage.number + 1}">
+              <i class="bi bi-chevron-right"></i>
+            </button>
+
+            <button type="button" class="btn btn-outline-secondary js-page"
+                    th:classappend="${usuariosPage.last} ? ' disabled' : ''"
+                    th:attr="data-page=${usuariosPage.totalPages - 1}">
+              <i class="bi bi-chevron-double-right"></i>
+            </button>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

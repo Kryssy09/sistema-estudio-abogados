@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layouts/base}" th:with="activeMenu='config'">
+
+<head>
+  <title>Gestión de Áreas</title>
+  <style>
+    .htmx-indicator {
+      display: none;
+    }
+
+    .htmx-request .htmx-indicator {
+      display: inline-block;
+    }
+  </style>
+</head>
+
+<body>
+  <div layout:fragment="content">
+    <!-- Page Header -->
+    <div th:replace="~{fragments/page-header :: page-header-simple('Gestión de Áreas')}"></div>
+
+    <!-- Barra de búsqueda y botones -->
+    <div class="card card-dark mb-3">
+      <div class="card-body">
+        <div class="d-flex gap-2 justify-content-between flex-wrap">
+          <form class="d-flex flex-grow-1" th:attr="hx-post=@{/areas}" hx-target="#areasTable" hx-swap="outerHTML"
+            hx-indicator="#searchSpinner" hx-include="#stateForm [name='size']" hx-vals='{"page":0}'>
+            <div class="input-group">
+              <span class="input-group-text bg-dark text-light border-secondary">
+                <i class="fa fa-search"></i>
+              </span>
+              <input class="form-control form-control-dark" type="search" name="q"
+                placeholder="Buscar por nombre de área..." th:value="${q}">
+              <button class="btn btn-secondary" type="submit">
+                <i class="fa fa-search me-1"></i> Buscar
+              </button>
+            </div>
+            <div id="searchSpinner" class="htmx-indicator ms-2 d-flex align-items-center">
+              <div class="spinner-border spinner-border-sm text-light" role="status">
+                <span class="visually-hidden">Cargando...</span>
+              </div>
+            </div>
+          </form>
+
+          <!-- Nueva Area -->
+          <button class="btn btn-primary js-form-modal" th:attr="data-hx-url=@{/areas/nuevo}">
+            <i class="fa fa-plus me-1"></i> Nueva Área
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contenedor actualizable -->
+    <div class="card card-dark">
+      <div class="card-body p-0">
+        <div id="areasTable" th:replace="~{areas/_tabla :: tabla( ${areasPage}, ${q}, ${size} )}">
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulario de estado oculto para mantener parámetros -->
+    <form id="stateForm" class="d-none">
+      <input type="hidden" name="page" th:value="${areasPage != null ? areasPage.number : 0}">
+      <input type="hidden" name="size" th:value="${size ?: 10}">
+      <input type="hidden" name="q" th:value="${q ?: ''}">
+    </form>
+  </div>
+
+  <!-- Scripts específicos -->
+  <th:block layout:fragment="scripts">
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+
+    <!-- Modal Confirmación Eliminar -->
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteLabel"
+      aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-light border-secondary">
+          <div class="modal-header border-secondary">
+            <h6 class="modal-title" id="confirmDeleteLabel">Confirmar eliminación</h6>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+              aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            ¿Seguro que deseas eliminar esta área? Esta acción no se puede deshacer.
+          </div>
+          <div class="modal-footer border-secondary">
+            <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-danger btn-sm" id="confirmDeleteBtn">
+              <i class="fa fa-trash me-1"></i> Eliminar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Form Editar y Crear -->
+    <div class="modal fade" id="formModal" tabindex="-1" aria-labelledby="formModalLabel" aria-hidden="true"
+      data-bs-backdrop="static" data-bs-keyboard="false">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-light border-secondary" id="formModalContent">
+          <!-- El contenido se carga vía HTMX -->
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Confirmación custom para ELIMINAR
+      let pendingDelete = null;
+
+      document.addEventListener('click', (ev) => {
+        const btn = ev.target.closest('.js-confirm-delete');
+        if (!btn) return;
+        pendingDelete = { url: btn.getAttribute('data-hx-url') };
+        const modal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+        modal.show();
+      });
+
+      function collectState() {
+        const f = document.getElementById('stateForm');
+        return {
+          page: Number(f.elements['page'].value || 0),
+          size: Number(f.elements['size'].value || 10),
+          q: f.elements['q'].value || ''
+        };
+      }
+
+      document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
+        if (!pendingDelete) return;
+        const vals = collectState();
+
+        htmx.ajax('DELETE', pendingDelete.url, {
+          target: '#areasTable',
+          swap: 'outerHTML',
+          values: vals,
+          headers: { 'X-Action': 'delete-user' } // Usamos el mismo header que tenías
+        });
+
+        const modalEl = document.getElementById('confirmDeleteModal');
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        modal.hide();
+        pendingDelete = null;
+      });
+
+      document.body.addEventListener('htmx:afterRequest', (evt) => {
+        const action = evt.detail.requestConfig?.headers?.['X-Action'];
+        if (action !== 'delete-user') return;
+
+        const status = evt.detail.xhr?.status ?? evt.detail.fetchResponse?.status;
+        if (status >= 200 && status < 300) {
+          showToast('Área eliminada correctamente.', 'success');
+        } else {
+          showToast('No se pudo eliminar el área.', 'danger');
+        }
+      });
+
+      // Paginación
+      document.addEventListener('click', (ev) => {
+        const btn = ev.target.closest('.js-page');
+        if (!btn) return;
+        if (btn.classList.contains('disabled')) return;
+
+        const page = Number(btn.getAttribute('data-page'));
+        const f = document.getElementById('stateForm');
+        const size = Number(f.elements['size'].value || 10);
+        const q = f.elements['q'].value || '';
+
+        htmx.ajax('POST', '/areas', {
+          target: '#areasTable',
+          swap: 'outerHTML',
+          values: { page, size, q }
+        });
+      });
+
+      // Carga de formulario en modal
+      document.addEventListener('click', (ev) => {
+        const btn = ev.target.closest('.js-form-modal');
+        if (!btn) return;
+
+        const url = btn.getAttribute('data-hx-url');
+
+        htmx.ajax('GET', url, {
+          target: '#formModalContent',
+          swap: 'innerHTML'
+        }).then(() => {
+          const modalEl = document.getElementById('formModal');
+          const modal = new bootstrap.Modal(modalEl);
+          modal.show();
+        });
+      });
+
+      // Limpia el contenido del modal al cerrarlo
+      document.getElementById('formModal').addEventListener('hidden.bs.modal', () => {
+        const modalContent = document.getElementById('formModalContent');
+        modalContent.innerHTML = '';
+        // Eliminar backdrops residuales si los hubiera
+        document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+      });
+
+      // Escuchar evento custom lanzado por el servidor (HX-Trigger)
+      document.body.addEventListener('areaSaved', (e) => {
+        const msg = (e && e.detail && e.detail.message) || 'Operación exitosa.';
+        // Cerrar modal
+        const modalEl = document.getElementById('formModal');
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        if (modal) modal.hide();
+        // Toast
+        showToast(msg, 'success');
+      });
+
+      document.body.addEventListener('areaError', (e) => {
+        const msg = (e && e.detail && e.detail.message) || 'No se pudo guardar el área.';
+        showToast(msg, 'danger');
+      });
+    </script>
+  </th:block>
+</body>
+
+</html>
