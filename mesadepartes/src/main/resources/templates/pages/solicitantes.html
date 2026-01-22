@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/base}" th:with="activeMenu='solicitantes'">
+
+<head>
+    <title>Solicitantes</title>
+</head>
+
+<body>
+    <div layout:fragment="content">
+        <!-- Page Header -->
+        <div th:replace="~{fragments/page-header :: page-header-simple('Solicitantes')}"></div>
+
+        <!-- Barra de búsqueda y botones -->
+        <div class="card card-dark mb-3">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-10">
+                        <div class="input-group">
+                            <span class="input-group-text bg-dark text-light border-secondary">
+                                <i class="fa fa-search"></i>
+                            </span>
+                            <input type="text" class="form-control form-control-dark"
+                                placeholder="Buscar por nombre, DNI..." id="buscadorSolicitantes">
+                            <button class="btn btn-secondary" type="button" id="btnBuscarSolicitantes">
+                                <i class="fa fa-search me-1"></i> Buscar
+                            </button>
+                            <button class="btn btn-outline-light" type="button" id="btnLimpiarBusqueda">
+                                <i class="fa fa-times me-1"></i> Limpiar
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-primary w-100" id="btnAddSolicitante">
+                            <i class="fa fa-plus me-1"></i> Nuevo Solicitante
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de solicitantes -->
+        <div class="card card-dark">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover mb-0" id="tableSolicitantes">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre Completo</th>
+                                <th>DNI</th>
+                                <th>Correo</th>
+                                <th>Teléfono</th>
+                                <th>Fecha Registro</th>
+                                <th class="text-center">Expedientes</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Contenido llenado dinámicamente -->
+                            <tr>
+                                <td colspan="9" class="text-center text-muted py-4">
+                                    <i class="fa fa-spinner fa-spin fa-2x mb-3 d-block"></i>
+                                    Cargando solicitantes...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal para crear/editar solicitante -->
+        <div class="modal fade" id="solicitanteModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content bg-dark text-light">
+                    <div class="modal-header border-secondary">
+                        <h5 class="modal-title" id="solicitanteModalTitle">Nuevo Solicitante</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="solicitanteForm">
+                            <input type="hidden" id="solicitanteId">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Tipo Documento <span class="text-danger">*</span></label>
+                                    <select class="form-select form-select-dark" id="tipoDocumento" required>
+                                        <option value="1">DNI</option>
+                                        <option value="2">Carnet Extranjería</option>
+                                        <option value="3">RUC</option>
+                                        <option value="4">Pasaporte</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Nro. Documento <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control form-control-dark" id="numeroDocumento"
+                                        required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Nombres <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control form-control-dark" id="nombres" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Ap. Paterno <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control form-control-dark" id="apellidoPaterno"
+                                        required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Ap. Materno <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control form-control-dark" id="apellidoMaterno"
+                                        required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control form-control-dark" id="email">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Teléfono</label>
+                                    <input type="text" class="form-control form-control-dark" id="telefono">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Sexo</label>
+                                    <select class="form-select form-select-dark" id="sexo">
+                                        <option value="1">Masculino</option>
+                                        <option value="2">Femenino</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer border-secondary">
+                        <button type="button" class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary" id="btnGuardarSolicitante">
+                            <i class="fa fa-save me-1"></i> Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- Scripts específicos de la página -->
+    <th:block layout:fragment="scripts">
+        <script>console.log('Solicitantes fragment loaded');</script>
+        <script th:src="@{/js/solicitante.js(v=4)}"></script>
+    </th:block>
+</body>
+
+</html>

@@ -1,0 +1,35 @@
+<div th:fragment="form(form, mode, page, size, q)">
+  <form class="p-0" th:object="${form}"
+    th:attr="hx-post=${mode=='create'} ? @{/areas/nuevo} : @{/areas/{id}(id=${form.idArea})}" hx-target="#areasTable"
+    hx-swap="outerHTML" hx-include="#stateForm [name='page'], #stateForm [name='size'], #stateForm [name='q']"
+    hx-headers='{"X-Action":"save-area"}'>
+
+    <div class="modal-header border-secondary">
+      <h5 class="modal-title" id="formModalLabel" th:text="${mode=='create'} ? 'Crear Área' : 'Editar Área'">Formulario
+        Área</h5>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+    </div>
+
+    <div class="modal-body">
+      <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+      <div class="mb-3">
+        <label for="nombreArea" class="form-label text-light">Nombre del Área <span class="text-danger">*</span></label>
+        <input type="text" class="form-control form-control-dark" id="nombreArea" name="nombreArea"
+          th:value="*{nombreArea}" th:field="*{nombreArea}" required>
+        <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('nombreArea')}" th:errors="*{nombreArea}">
+        </div>
+      </div>
+
+      <!-- Si es edición, enviar el ID -->
+      <input type="hidden" name="idArea" th:if="${mode=='edit'}" th:value="*{idArea}">
+    </div>
+
+    <div class="modal-footer border-secondary">
+      <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Cancelar</button>
+      <button type="submit" class="btn btn-primary btn-sm">
+        <i class="fa fa-save me-1"></i> Guardar
+      </button>
+    </div>
+  </form>
+</div>

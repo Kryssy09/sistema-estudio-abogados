@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/base}"
+      th:with="activeMenu='usuarios'">
+
+<head>
+    <title th:text="${isEdit ? 'Editar Usuario' : 'Crear Usuario'}">Usuario</title>
+</head>
+
+<body>
+    <div layout:fragment="content">
+        <!-- Page Header -->
+        <div th:replace="~{fragments/page-header :: page-header(${isEdit ? 'Editar Usuario' : 'Crear Usuario'}, true, '/usuarios')}"></div>
+
+        <!-- Mensaje de error general -->
+        <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+        <form th:action="${isEdit ? '/usuarios/editar/' + form.idUsuario : '/usuarios/crear'}"
+              method="post"
+              th:object="${form}"
+              class="row g-3"
+              enctype="multipart/form-data">
+
+            <!-- Foto de perfil -->
+            <div class="col-12 col-lg-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h6 class="text-secondary">Foto de Perfil</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex flex-column justify-content-center align-items-center gap-3">
+                            <img id="fotoPreview"
+                                 th:src="@{/images/avatar-placeholder.png}"
+                                 alt="Foto"
+                                 class="rounded-circle border"
+                                 style="width: 200px; height: 200px; object-fit: cover;">
+
+                            <div class="d-flex align-items-center gap-2">
+                                <input id="fotoInput" type="file" name="foto" class="form-control d-none" accept="image/*">
+                                <button type="button" class="btn btn-outline-primary btn-sm" id="btnCambiarFoto">
+                                    <i class="bi bi-image"></i> Elegir Foto
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-text mt-3 text-center">Formatos: JPG, PNG, WEBP. Máx: 2 MB.</div>
+
+                        <!-- Error de imagen -->
+                        <div class="invalid-feedback d-block" th:if="${fotoError}" th:text="${fotoError}"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Datos del formulario -->
+            <div class="col-12 col-lg-8">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h6 class="text-secondary">Información del Usuario</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <!-- Datos personales -->
+                            <div class="col-12">
+                                <h6 class="text-secondary mb-3">Datos Personales</h6>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Apellido Paterno <span class="text-danger">*</span></label>
+                                <input class="form-control" th:field="*{apellidoPaterno}">
+                                <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('apellidoPaterno')}" th:errors="*{apellidoPaterno}"></div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Apellido Materno <span class="text-danger">*</span></label>
+                                <input class="form-control" th:field="*{apellidoMaterno}">
+                                <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('apellidoMaterno')}" th:errors="*{apellidoMaterno}"></div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label class="form-label">Nombres <span class="text-danger">*</span></label>
+                                <input class="form-control" th:field="*{nombres}">
+                                <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('nombres')}" th:errors="*{nombres}"></div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Tipo Documento <span class="text-danger">*</span></label>
+                                <select class="form-select" th:field="*{tipoDocumentoIdentidad}">
+                                    <option th:value="1">DNI</option>
+                                    <option th:value="2">CE</option>
+                                    <option th:value="3">Pasaporte</option>
+                                </select>
+                                <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('tipoDocumentoIdentidad')}" th:errors="*{tipoDocumentoIdentidad}"></div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">N° Documento <span class="text-danger">*</span></label>
+                                <input class="form-control" th:field="*{numeroDocumento}">
+                                <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('numeroDocumento')}" th:errors="*{numeroDocumento}"></div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Correo Electrónico</label>
+                                <input class="form-control" th:field="*{correoElectronico}">
+                                <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('correoElectronico')}" th:errors="*{correoElectronico}"></div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Teléfono</label>
+                                <input class="form-control" th:field="*{telefonoPersonal}">
+                            </div>
+
+                            <!-- Credenciales -->
+                            <div class="col-12">
+                                <h6 class="text-secondary mb-3 mt-4">Credenciales</h6>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Usuario <span class="text-danger">*</span></label>
+                                <input class="form-control" th:field="*{nombreUsuario}">
+                                <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('nombreUsuario')}" th:errors="*{nombreUsuario}"></div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Contraseña <span class="text-danger" th:if="${!isEdit}">*</span></label>
+                                <input type="password" class="form-control" th:field="*{clave}"
+                                       th:placeholder="${isEdit ? 'Dejar en blanco para mantener la actual' : ''}">
+                                <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('clave')}" th:errors="*{clave}"></div>
+                            </div>
+
+                            <!-- Roles -->
+                            <div class="col-12">
+                                <h6 class="text-secondary mb-3 mt-4">Roles</h6>
+                                <div class="d-inline-flex gap-2 mb-3">
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" id="roles-select-all">Todos</button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" id="roles-clear">Ninguno</button>
+                                </div>
+
+                                <div th:if="${#lists.isEmpty(roles)}" class="alert alert-warning">
+                                    No hay roles disponibles.
+                                </div>
+
+                                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-2">
+                                    <div class="col" th:each="r : ${roles}">
+                                        <div class="form-check">
+                                            <input class="form-check-input"
+                                                  type="checkbox"
+                                                  th:field="*{rolesIds}"
+                                                  th:value="${r.id}"
+                                                  th:id="'rol_'+${r.id}">
+                                            <label class="form-check-label" th:for="'rol_'+${r.id}">
+                                                <span th:text="${r.nombreRol}">Nombre del Rol</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="invalid-feedback d-block"
+                                     th:if="${#fields.hasErrors('rolesIds')}"
+                                     th:errors="*{rolesIds}"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="col-12">
+                <div class="d-flex justify-content-between gap-2 mt-3">
+                    <div class="form-text">
+                        <span class="text-danger">*</span> Campos obligatorios
+                    </div>
+                    <div>
+                        <a th:href="@{/usuarios}" class="btn btn-outline-secondary me-2">
+                            <i class="fa fa-times me-1"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-save me-1"></i>
+                            <span th:text="${isEdit ? 'Actualizar' : 'Crear'}">Guardar</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Scripts específicos -->
+    <th:block layout:fragment="scripts">
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Selección de roles
+                document.getElementById('roles-select-all')?.addEventListener('click', () => {
+                    document.querySelectorAll('input[name="rolesIds"]').forEach(cb => cb.checked = true);
+                });
+
+                document.getElementById('roles-clear')?.addEventListener('click', () => {
+                    document.querySelectorAll('input[name="rolesIds"]').forEach(cb => cb.checked = false);
+                });
+
+                // Vista previa de foto
+                const inp = document.getElementById('fotoInput');
+                const prev = document.getElementById('fotoPreview');
+                const btnChange = document.getElementById('btnCambiarFoto');
+
+                btnChange?.addEventListener('click', () => inp?.click());
+
+                inp?.addEventListener('change', () => {
+                    const file = inp.files?.[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (e) => { prev.src = e.target.result; };
+                    reader.readAsDataURL(file);
+                });
+            });
+        </script>
+    </th:block>
+</body>
+</html>
