@@ -113,6 +113,9 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+	<build>
+    <testSourceDirectory>src/Test</testSourceDirectory>
+</build>
 	
 	<build>
 		<finalName>${project.artifactId}</finalName>
