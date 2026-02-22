@@ -6,7 +6,8 @@ pipeline {
         stage('Compilar proyecto') {
             steps {
                 dir('mesadepartes') {
-                    sh 'mvn clean compile'
+                    // Usamos el Maven Wrapper para asegurar la versión correcta
+                    sh './mvnw clean compile'
                 }
             }
         }
@@ -14,11 +15,12 @@ pipeline {
         stage('Ejecutar pruebas') {
             steps {
                 dir('mesadepartes') {
-                    sh 'mvn test'
+                    sh './mvnw test'
                 }
             }
             post {
                 always {
+                    // Publica los reportes de pruebas en Jenkins
                     junit 'mesadepartes/target/surefire-reports/*.xml'
                 }
             }
@@ -27,8 +29,9 @@ pipeline {
         stage('Análisis de calidad') {
             steps {
                 dir('mesadepartes') {
+                    // Ejecuta análisis de SonarQube usando el servidor configurado en Jenkins
                     withSonarQubeEnv('SonarQube') {
-                        sh 'mvn clean verify sonar:sonar -Dsonar.projectKey=mesadepartes'
+                        sh './mvnw clean verify sonar:sonar -Dsonar.projectKey=mesadepartes'
                     }
                 }
             }
