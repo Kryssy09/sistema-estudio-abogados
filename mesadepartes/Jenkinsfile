@@ -5,7 +5,7 @@ pipeline {
 
         stage('Compilar proyecto') {
             steps {
-                dir('mesadepartes') {
+                dir('sistema-estudio-abogados') {
                     sh 'mvn clean compile'
                 }
             }
@@ -13,22 +13,22 @@ pipeline {
 
         stage('Ejecutar pruebas') {
             steps {
-                dir('mesadepartes') {
+                dir('sistema-estudio-abogados') {
                     sh 'mvn test'
                 }
             }
             post {
                 always {
-                    junit 'mesadepartes/target/surefire-reports/*.xml'
+                    junit 'sistema-estudio-abogados/target/surefire-reports/*.xml'
                 }
             }
         }
 
         stage('Análisis de calidad') {
             steps {
-                dir('mesadepartes') {
+                dir('sistema-estudio-abogados') {
                     withSonarQubeEnv('SonarQube') {
-                        sh 'mvn clean verify sonar:sonar -Dsonar.projectKey=mesadepartes'
+                        sh 'mvn clean verify sonar:sonar -Dsonar.projectKey=sistema-estudio-abogados'
                     }
                 }
             }
