@@ -3,24 +3,21 @@ pipeline {
 
     stages {
 
-        stage('Clonar código') {
-            steps {
-                checkout scm
-            }
-        }
-
         stage('Compilar proyecto') {
             steps {
-                bat 'mvn clean compile'
+                dir('mesadepartes') {
+                    bat 'mvn clean compile'
+                }
             }
         }
 
         stage('Ejecutar pruebas') {
             steps {
-                bat 'mvn test'
+                dir('mesadepartes') {
+                    bat 'mvn test'
+                }
             }
         }
 
     }
 }
-
