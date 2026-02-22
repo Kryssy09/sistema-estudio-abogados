@@ -15,6 +15,7 @@ pipeline {
         stage('Ejecutar pruebas') {
             steps {
                 dir('mesadepartes') {
+                    sh 'chmod +x mvnw'
                     sh './mvnw test'
                 }
             }
