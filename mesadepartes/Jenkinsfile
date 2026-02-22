@@ -14,7 +14,11 @@ pipeline {
         stage('Ejecutar pruebas') {
             steps {
                 dir('mesadepartes') {
-                    sh 'mvn test'
+                    sh '''
+                    mvn test \
+                    -DtestSourceDirectory=src/Test \
+                    -Dsurefire.useFile=false
+                    '''
                 }
             }
             post {
