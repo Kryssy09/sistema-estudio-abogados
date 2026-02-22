@@ -17,8 +17,21 @@ pipeline {
                     sh 'mvn test'
                 }
             }
+            post {
+                always {
+                    junit 'mesadepartes/target/surefire-reports/*.xml'
+                }
+            }
         }
 
+        stage('Análisis de calidad') {
+            steps {
+                dir('mesadepartes') {
+                    withSonarQubeEnv('SonarQube') {
+                        sh 'mvn clean verify sonar:sonar -Dsonar.projectKey=mesadepartes'
+                    }
+                }
+            }
+        }
     }
 }
-
