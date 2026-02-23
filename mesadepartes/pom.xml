@@ -112,12 +112,9 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-	</dependencies>
+	</dependencies>	
 	<build>
-    <testSourceDirectory>src/Test</testSourceDirectory>
-</build>
-	
-	<build>
+		<testSourceDirectory>src/Test</testSourceDirectory>
 		<finalName>${project.artifactId}</finalName>
 		<plugins>
 			<plugin>
