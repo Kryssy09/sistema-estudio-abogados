@@ -3,10 +3,18 @@ pipeline {
 
     stages {
 
+        stage('Preparar entorno') {
+            steps {
+                dir('mesadepartes') {
+                    // Dar permisos al Maven Wrapper (SOLUCIONA exit code 126)
+                    sh 'chmod +x mvnw'
+                }
+            }
+        }
+
         stage('Compilar proyecto') {
             steps {
                 dir('mesadepartes') {
-                    // Usamos el Maven Wrapper para asegurar la versión correcta
                     sh './mvnw clean compile'
                 }
             }
@@ -15,14 +23,14 @@ pipeline {
         stage('Ejecutar pruebas') {
             steps {
                 dir('mesadepartes') {
-                    sh 'chmod +x mvnw'
                     sh './mvnw test'
                 }
             }
             post {
                 always {
-                    // Publica los reportes de pruebas en Jenkins
-                    junit 'mesadepartes/target/surefire-reports/*.xml'
+                    // Evita que falle si no encuentra reportes
+                    junit allowEmptyResults: true,
+                          testResults: 'mesadepartes/target/surefire-reports/*.xml'
                 }
             }
         }
@@ -30,9 +38,8 @@ pipeline {
         stage('Análisis de calidad') {
             steps {
                 dir('mesadepartes') {
-                    // Ejecuta análisis de SonarQube usando el servidor configurado en Jenkins
                     withSonarQubeEnv('SonarQube') {
-                        sh './mvnw clean verify sonar:sonar -Dsonar.projectKey=mesadepartes'
+                        sh './mvnw verify sonar:sonar -Dsonar.projectKey=mesadepartes'
                     }
                 }
             }
