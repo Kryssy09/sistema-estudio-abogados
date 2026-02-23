@@ -45,4 +45,9 @@ pipeline {
             }
         }
     }
+    post {
+        success {
+            archiveArtifacts artifacts: 'mesadepartes/target/*.jar', fingerprint: true
+        }
+    }
 }
