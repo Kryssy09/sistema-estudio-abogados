@@ -112,13 +112,18 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+<<<<<<< HEAD
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
 	</dependencies>
 	
+=======
+	</dependencies>	
+>>>>>>> 830226a8ae7e8d035c5f6d746c3a2732fa6e1524
 	<build>
+		<testSourceDirectory>src/Test</testSourceDirectory>
 		<finalName>${project.artifactId}</finalName>
 		<plugins>
 			<plugin>

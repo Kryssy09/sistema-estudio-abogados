@@ -1,0 +1,53 @@
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Preparar entorno') {
+            steps {
+                dir('mesadepartes') {
+                    // Dar permisos al Maven Wrapper (SOLUCIONA exit code 126)
+                    sh 'chmod +x mvnw'
+                }
+            }
+        }
+
+        stage('Compilar proyecto') {
+            steps {
+                dir('mesadepartes') {
+                    sh './mvnw clean compile'
+                }
+            }
+        }
+
+        stage('Ejecutar pruebas') {
+            steps {
+                dir('mesadepartes') {
+                    sh './mvnw test'
+                }
+            }
+            post {
+                always {
+                    // Evita que falle si no encuentra reportes
+                    junit allowEmptyResults: true,
+                          testResults: 'mesadepartes/target/surefire-reports/*.xml'
+                }
+            }
+        }
+
+        stage('Análisis de calidad') {
+            steps {
+                dir('mesadepartes') {
+                    withSonarQubeEnv('SonarQube') {
+                        sh './mvnw verify sonar:sonar -Dsonar.projectKey=mesadepartes'
+                    }
+                }
+            }
+        }
+    }
+    post {
+        success {
+            archiveArtifacts artifacts: 'mesadepartes/target/*.jar', fingerprint: true
+        }
+    }
+}
