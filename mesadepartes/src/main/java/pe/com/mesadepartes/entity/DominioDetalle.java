@@ -31,7 +31,7 @@ import lombok.NoArgsConstructor;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class DominioDetalle extends EntidadBase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,5 +43,6 @@ public class DominioDetalle extends EntidadBase {
     private int codigo;
     private String nombre;
     private String sigla;
+    @Column(name = "valorCadena", length = 4000)
     private String valorCadena;
 }

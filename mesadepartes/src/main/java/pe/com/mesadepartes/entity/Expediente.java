@@ -43,8 +43,14 @@ public class Expediente {
     @Column(name = "rutaArchivoFormatoSolicitud", length = 1000, nullable = false)
     private String rutaArchivoFormatoSolicitud;
 
+    @Column(name = "rutaCargoRecepcion", length = 1000)
+    private String rutaCargoRecepcion;
+
     @Column(name = "reseniaSolicitud", length = 4000, nullable = false)
     private String reseniaSolicitud;
+
+    @Column(name = "prioridad", length = 10)
+    private String prioridad;
 
     @Column(name = "fechaAsignacion")
     private Date fechaAsignacion;
@@ -72,6 +78,9 @@ public class Expediente {
 
     @Column(name = "fechaModificacion")
     private Date fechaModificacion;
+
+    @Column(name = "motivoCierre", length = 1000)
+    private String motivoCierre;
 
     @Column(name = "estadoRegistro", length = 4, nullable = false)
     private String estadoRegistro;

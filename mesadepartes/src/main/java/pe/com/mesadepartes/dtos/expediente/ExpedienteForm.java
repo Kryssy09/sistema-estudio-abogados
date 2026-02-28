@@ -18,6 +18,8 @@ public class ExpedienteForm {
 
     private String reseniaSolicitud;
 
+    private String prioridad; // Alta, Media, Baja
+
     private Integer solicitanteId; // Para creación
     private Integer invitadoId; // Para edición
     private Integer idUsuarioAsignado; // Para edición
@@ -27,15 +29,17 @@ public class ExpedienteForm {
     private String formatoArchivoNombre;
 
     // Constructor para creación
-    public ExpedienteForm() {}
+    public ExpedienteForm() {
+    }
 
     // Constructor para edición
     public ExpedienteForm(Integer idExpediente, String tipoExpediente, Boolean mutuoAcuerdo,
-                         Integer especialidadId, String reseniaSolicitud) {
+            Integer especialidadId, String reseniaSolicitud, String prioridad) {
         this.idExpediente = idExpediente;
         this.tipoExpediente = tipoExpediente;
         this.mutuoAcuerdo = mutuoAcuerdo;
         this.especialidadId = especialidadId;
         this.reseniaSolicitud = reseniaSolicitud;
+        this.prioridad = prioridad;
     }
 }

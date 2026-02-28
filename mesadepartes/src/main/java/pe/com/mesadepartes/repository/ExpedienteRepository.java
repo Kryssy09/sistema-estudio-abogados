@@ -3,6 +3,7 @@ package pe.com.mesadepartes.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -13,13 +14,16 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ExpedienteRepository extends JpaRepository<Expediente, Integer> {
+public interface ExpedienteRepository extends JpaRepository<Expediente, Integer>, JpaSpecificationExecutor<Expediente> {
 
   @Query("SELECT e FROM Expediente e WHERE e.estadoRegistro = 'ACT' and ( " +
       "LOWER(e.codigoSeguimiento) LIKE LOWER(CONCAT('%', :busqueda, '%')) OR " +
       "LOWER(e.tipoExpediente) LIKE LOWER(CONCAT('%', :busqueda, '%')) OR " +
       "LOWER(e.estadoExpediente) LIKE LOWER(CONCAT('%', :busqueda, '%')) OR " +
-      "LOWER(e.reseniaSolicitud) LIKE LOWER(CONCAT('%', :busqueda, '%')) )")
+      "LOWER(e.reseniaSolicitud) LIKE LOWER(CONCAT('%', :busqueda, '%')) OR " +
+      "LOWER(e.personaSolicitante.persona.nombres) LIKE LOWER(CONCAT('%', :busqueda, '%')) OR " +
+      "LOWER(e.personaSolicitante.persona.apellidoPaterno) LIKE LOWER(CONCAT('%', :busqueda, '%')) OR " +
+      "LOWER(e.personaSolicitante.persona.numeroDocumento) LIKE LOWER(CONCAT('%', :busqueda, '%')) )")
   Page<Expediente> buscarExpedientes(@Param("busqueda") String busqueda, Pageable pageable);
 
   // === Datos para el gráfico (MySQL/MariaDB) ===
@@ -55,4 +59,7 @@ public interface ExpedienteRepository extends JpaRepository<Expediente, Integer>
 
   // Método para contar expedientes por estado
   long countByEstadoExpediente(String estadoExpediente);
+
+  // Método para buscar expedientes por rango de fechas
+  List<Expediente> findAllByFechaCreacionBetween(java.util.Date start, java.util.Date end);
 }

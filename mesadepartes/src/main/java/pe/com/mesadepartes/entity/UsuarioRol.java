@@ -20,12 +20,12 @@ public class UsuarioRol implements Serializable {
 
   @MapsId("idUsuario")
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "id_usuario", nullable = false)
+  @JoinColumn(name = "id_usuario", nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
   private Usuario usuario;
 
   @MapsId("idRol")
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "id_rol", nullable = false)
+  @JoinColumn(name = "id_rol", nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
   private Rol rol;
 
   @Column(name = "estadoRegistro", nullable = false, length = 4)

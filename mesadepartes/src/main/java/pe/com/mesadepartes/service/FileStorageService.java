@@ -103,6 +103,39 @@ public class FileStorageService {
         nombreDestino);
   }
 
+  public String guardarCargoExpediente(String codigoExpediente, byte[] fileBytes) throws Exception {
+    if (fileBytes == null || fileBytes.length == 0)
+      return null;
+
+    LocalDate today = LocalDate.now();
+    Path rootDir = Paths.get(storageRoot).toAbsolutePath().normalize();
+    Path dir = rootDir.resolve(Paths.get(
+        "expedientes",
+        String.valueOf(today.getYear()),
+        String.format("%02d", today.getMonthValue()),
+        String.format("%02d", today.getDayOfMonth()),
+        "cargos"));
+
+    Files.createDirectories(dir);
+
+    String nombreDestino = today.toEpochDay() + "_cargo_" + codigoExpediente + ".pdf";
+    Path destino = dir.resolve(nombreDestino).normalize();
+
+    if (!destino.startsWith(dir)) {
+      throw new SecurityException("Ruta de archivo inválida.");
+    }
+
+    Files.write(destino, fileBytes);
+
+    return String.join("/",
+        "expedientes",
+        String.valueOf(today.getYear()),
+        String.format("%02d", today.getMonthValue()),
+        String.format("%02d", today.getDayOfMonth()),
+        "cargos",
+        nombreDestino);
+  }
+
   public String guardarFoto(MultipartFile file) throws Exception {
     if (file == null || file.isEmpty())
       return null;
@@ -149,6 +182,22 @@ public class FileStorageService {
     } catch (Exception ex) {
       System.err.println("No se pudo eliminar archivo físico '" + rutaRelativa + "': " + ex.getMessage());
       return false;
+    }
+  }
+
+  public byte[] leerArchivo(String rutaRelativa) {
+    if (rutaRelativa == null || rutaRelativa.isBlank())
+      return null;
+    try {
+      Path root = Paths.get(storageRoot).toAbsolutePath().normalize();
+      Path target = root.resolve(rutaRelativa).normalize();
+      if (!target.startsWith(root)) {
+        throw new SecurityException("Ruta de archivo inválida: " + rutaRelativa);
+      }
+      return Files.readAllBytes(target);
+    } catch (Exception ex) {
+      System.err.println("No se pudo leer archivo físico '" + rutaRelativa + "': " + ex.getMessage());
+      return null;
     }
   }
 

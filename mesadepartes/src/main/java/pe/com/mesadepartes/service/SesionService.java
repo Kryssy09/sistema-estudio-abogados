@@ -59,18 +59,18 @@ public class SesionService {
 
   public List<SesionListItem> findSesionesByExpediente(Integer idExpediente) {
     String jpql = """
-        SELECT new pe.com.mesadepartes.dtos.sesion.SesionListItem(
-          s.idExpedienteSesion,
-          s.estadoSesion,
-          s.fechaSesion,
-          s.resolucionSesion,
-          s.detallesSesion,
-          s.secuencia
-        )
-        FROM ExpedienteSesion s
-        WHERE s.expediente.idExpediente = :idExpediente
-        ORDER BY s.idExpedienteSesion DESC
-      """;
+          SELECT new pe.com.mesadepartes.dtos.sesion.SesionListItem(
+            s.idExpedienteSesion,
+            s.estadoSesion,
+            s.fechaSesion,
+            s.resolucionSesion,
+            s.detallesSesion,
+            s.secuencia
+          )
+          FROM ExpedienteSesion s
+          WHERE s.expediente.idExpediente = :idExpediente
+          ORDER BY s.idExpedienteSesion DESC
+        """;
     return em.createQuery(jpql, SesionListItem.class)
         .setParameter("idExpediente", idExpediente)
         .getResultList();
@@ -97,9 +97,13 @@ public class SesionService {
   public ExpedienteSesion actualizarSesion(EditArchivoSesion form) {
     ExpedienteSesion sesion = em.find(ExpedienteSesion.class, form.getIdExpedienteSesion());
     if (sesion != null) {
-      sesion.setEstadoSesion(form.getEstadoSesion());
-      sesion.setDetallesSesion(form.getDetallesSesion());
-      sesion.setFechaSesion(form.getFechaSesion());
+      if (form.getEstadoSesion() != null && !form.getEstadoSesion().isEmpty()) {
+        sesion.setEstadoSesion(form.getEstadoSesion());
+      }
+      if (form.getDetallesSesion() != null && !form.getDetallesSesion().isEmpty()) {
+        sesion.setDetallesSesion(form.getDetallesSesion());
+      }
+      sesion.setFechaSesion(form.getFechaSesion() != null ? form.getFechaSesion() : sesion.getFechaSesion());
       sesion.setResolucionSesion(form.getResolucionSesion());
       sesion.setFechaModificacion(LocalDateTime.now());
       sesion.setIdUsuarioModificador(1);
