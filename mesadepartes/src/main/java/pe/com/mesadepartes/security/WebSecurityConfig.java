@@ -84,7 +84,14 @@ public class WebSecurityConfig {
         // configuration.
         // Permitir CSRF para endpoints específicos de AJAX
         http.csrf(csrf -> csrf
-                .ignoringRequestMatchers("/expedientes/sesion/delete/**", "/solicitantes/**", "/api/externo/**"));
+                .ignoringRequestMatchers(
+                        "/expedientes/sesion/delete/**",
+                        "/expedientes/*/derivar",
+                        "/expedientes/*/asignar",
+                        "/expedientes/*/actualizar-estado",
+                        "/expedientes/*/cerrar",
+                        "/solicitantes/**",
+                        "/api/externo/**"));
 
         return http.build();
     }

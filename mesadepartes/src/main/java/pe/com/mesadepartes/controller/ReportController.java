@@ -12,6 +12,8 @@ import pe.com.mesadepartes.service.ReportService;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Date;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @RestController
 @RequestMapping("/reportes")
@@ -29,9 +31,11 @@ public class ReportController {
      * ===========================
      */
     @GetMapping("/pdf/expedientes")
-    public ResponseEntity<byte[]> generarPdfExpedientes() {
+    public ResponseEntity<byte[]> generarPdfExpedientes(
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date fechaInicio,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date fechaFin) {
         try {
-            byte[] pdf = reportService.generarPdfExpedientes();
+            byte[] pdf = reportService.generarPdfExpedientes(fechaInicio, fechaFin);
 
             String filename = "reporte_expedientes_" + LocalDateTime.now().format(FILE_DATE_FORMATTER) + ".pdf";
 
@@ -76,7 +80,7 @@ public class ReportController {
     public ResponseEntity<byte[]> generarPdfTiempos() {
         // Por ahora retorna el mismo que expedientes
         // Puedes implementar lógica específica de tiempos después
-        return generarPdfExpedientes();
+        return generarPdfExpedientes(null, null);
     }
 
     /*
@@ -85,9 +89,11 @@ public class ReportController {
      * ===========================
      */
     @GetMapping("/excel/expedientes")
-    public ResponseEntity<byte[]> exportarExpedientesExcel() {
+    public ResponseEntity<byte[]> exportarExpedientesExcel(
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date fechaInicio,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date fechaFin) {
         try {
-            byte[] excel = reportService.exportarExpedientesExcel();
+            byte[] excel = reportService.exportarExpedientesExcel(fechaInicio, fechaFin);
 
             String filename = "expedientes_" + LocalDateTime.now().format(FILE_DATE_FORMATTER) + ".xlsx";
 
@@ -139,6 +145,38 @@ public class ReportController {
                 porEstado.put(e, count);
             }
             return ResponseEntity.ok(porEstado);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping("/estadisticas/resumen")
+    public ResponseEntity<?> obtenerResumenPorFechas(
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date fechaInicio,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date fechaFin) {
+        try {
+            List<Expediente> expedientes;
+            if (fechaInicio != null && fechaFin != null) {
+                expedientes = expedienteRepository.findAllByFechaCreacionBetween(fechaInicio, fechaFin);
+            } else {
+                expedientes = expedienteRepository.findAll();
+            }
+
+            long totalIngresados = expedientes.size();
+            long totalAtendidos = expedientes.stream()
+                    .filter(e -> "EN_ATE".equals(e.getEstadoExpediente()) || "CERR".equals(e.getEstadoExpediente()))
+                    .count();
+            long totalPendientes = expedientes.stream()
+                    .filter(e -> "SIN_ASIG".equals(e.getEstadoExpediente()) || "ASIG".equals(e.getEstadoExpediente()))
+                    .count();
+
+            java.util.Map<String, Long> resumen = new java.util.HashMap<>();
+            resumen.put("Ingresados", totalIngresados);
+            resumen.put("Atendidos", totalAtendidos);
+            resumen.put("Pendientes", totalPendientes);
+
+            return ResponseEntity.ok(resumen);
+
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }

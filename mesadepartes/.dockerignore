@@ -1,0 +1,27 @@
+# ─── Construidos por Maven ────────────────────────────────────
+target/
+
+# ─── IDE y configuración local ───────────────────────────────
+.vscode/
+.idea/
+*.iml
+.mvn/wrapper/
+
+# ─── Logs y archivos temporales ──────────────────────────────
+*.log
+*.log.*
+uploads/
+
+# ─── Git ─────────────────────────────────────────────────────
+.git/
+.gitignore
+.gitattributes
+.github/
+
+# ─── Docker ──────────────────────────────────────────────────
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# ─── Variables de entorno locales ────────────────────────────
+.env

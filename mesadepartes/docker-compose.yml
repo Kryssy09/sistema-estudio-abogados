@@ -1,0 +1,77 @@
+version: "3.9"
+
+# ============================================================
+# Sistema Mesa de Partes - Docker Compose
+# ============================================================
+# Servicios:
+#   db  → MySQL 8 con la base de datos mesa_de_partes_demo
+#   app → Spring Boot (mesadepartes)
+# ============================================================
+
+services:
+
+  # ─── Base de datos MySQL ───────────────────────────────────
+  db:
+    image: mysql:8.0
+    container_name: mesapartes_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-mysqlpassword}
+      MYSQL_DATABASE: mesa_de_partes_demo
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:-mysqlpassword}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - mesapartes_net
+
+  # ─── Aplicación Spring Boot ───────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mesapartes_app
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      # Sobreescribe la URL de BD para apuntar al contenedor "db"
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/mesa_de_partes_demo?serverTimezone=America/Lima&useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      DB_PASSWORD: ${DB_PASSWORD:-mysqlpassword}
+
+      # Configuración de correo (opcional: reemplazar con valores reales)
+      SPRING_MAIL_HOST: ${MAIL_HOST:-smtp.gmail.com}
+      SPRING_MAIL_PORT: ${MAIL_PORT:-587}
+      SPRING_MAIL_USERNAME: ${MAIL_USERNAME:-tu_correo@gmail.com}
+      SPRING_MAIL_PASSWORD: ${MAIL_PASSWORD:-tu_contraseña_de_app}
+
+      # JWT
+      APP_JWT_SECRET: ${JWT_SECRET:-mesadepartessystemsecretkey2024formainappproduction}
+
+    volumes:
+      # Persistir archivos subidos fuera del contenedor
+      - uploads_data:/root/mesadepartes/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - mesapartes_net
+
+# ─── Volumes persistentes ─────────────────────────────────────
+volumes:
+  mysql_data:
+    driver: local
+  uploads_data:
+    driver: local
+
+# ─── Red interna ──────────────────────────────────────────────
+networks:
+  mesapartes_net:
+    driver: bridge

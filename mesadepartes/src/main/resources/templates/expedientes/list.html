@@ -1,9 +1,6 @@
 <!DOCTYPE html>
-<html lang="es"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/base}"
-      th:with="activeMenu='expedientes'">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layouts/base}" th:with="activeMenu='expedientes'">
 
 <head>
     <title>Bandeja de Expedientes</title>
@@ -17,31 +14,91 @@
         <!-- Barra de búsqueda y botones -->
         <div class="card card-dark mb-3">
             <div class="card-body">
-                <form th:action="@{/expedientes}" method="get" class="row g-3">
-                    <div class="col-md-10">
-                        <div class="input-group">
-                            <span class="input-group-text bg-dark text-light border-secondary">
-                                <i class="fa fa-search"></i>
-                            </span>
-                            <input type="text"
-                                   name="search"
-                                   class="form-control form-control-dark"
-                                   placeholder="Buscar por código de seguimiento, solicitante, tipo..."
-                                   th:value="${param.search}">
-                            <button class="btn btn-secondary" type="submit">
-                                <i class="fa fa-search me-1"></i> Buscar
-                            </button>
-                            <a th:href="@{/expedientes}"
-                               class="btn btn-outline-light"
-                               th:if="${param.search}">
-                                <i class="fa fa-times me-1"></i> Limpiar
+                <form id="formBusqueda" th:action="@{/expedientes}" method="get">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-10">
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark text-light border-secondary">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                                <input type="text" name="search" class="form-control form-control-dark"
+                                    placeholder="Buscar por código, solicitante (DNI/Nombre), tipo..."
+                                    th:value="${param.search}">
+                                <button class="btn btn-secondary" type="submit">
+                                    <i class="fa fa-search me-1"></i> Buscar
+                                </button>
+                                <button class="btn btn-outline-info" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#filtrosAvanzados" aria-expanded="false"
+                                    aria-controls="filtrosAvanzados">
+                                    <i class="fa fa-filter me-1"></i> Filtros
+                                </button>
+                                <a th:href="@{/expedientes}" class="btn btn-outline-light"
+                                    th:if="${param.search != null or paramEstado != null or paramArea != null or paramEspecialista != null or paramFechaDesde != null or paramFechaHasta != null}">
+                                    <i class="fa fa-times me-1"></i> Limpiar
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <a th:href="@{/expedientes/crear}" class="btn btn-primary w-100">
+                                <i class="fa fa-plus me-1"></i> Nuevo Expediente
                             </a>
                         </div>
                     </div>
-                    <div class="col-md-2">
-                        <a th:href="@{/expedientes/crear}" class="btn btn-primary w-100">
-                            <i class="fa fa-plus me-1"></i> Nuevo Expediente
-                        </a>
+
+                    <!-- Filtros Avanzados (Colapsable) -->
+                    <div class="collapse" id="filtrosAvanzados"
+                        th:classappend="${paramEstado != null or paramArea != null or paramEspecialista != null or paramFechaDesde != null or paramFechaHasta != null ? 'show' : ''}">
+                        <div class="card card-body bg-dark border-secondary">
+                            <div class="row g-3">
+                                <!-- Estado -->
+                                <div class="col-md-3">
+                                    <label class="form-label text-light small">Estado</label>
+                                    <select name="estado" class="form-select form-select-sm form-select-dark">
+                                        <option value="">Todos los Estados</option>
+                                        <option value="SIN_ASIG" th:selected="${paramEstado == 'SIN_ASIG'}">Sin Asignar
+                                        </option>
+                                        <option value="ASIG" th:selected="${paramEstado == 'ASIG'}">Asignado</option>
+                                        <option value="EN_ATE" th:selected="${paramEstado == 'EN_ATE'}">En Atención
+                                        </option>
+                                        <option value="CERR" th:selected="${paramEstado == 'CERR'}">Cerrado</option>
+                                        <option value="ANUL" th:selected="${paramEstado == 'ANUL'}">Anulado</option>
+                                    </select>
+                                </div>
+                                <!-- Área -->
+                                <div class="col-md-3">
+                                    <label class="form-label text-light small">Área</label>
+                                    <select name="idArea" class="form-select form-select-sm form-select-dark">
+                                        <option value="">Todas las Áreas</option>
+                                        <option th:each="area : ${areas}" th:value="${area.idArea}"
+                                            th:text="${area.nombreArea}" th:selected="${paramArea == area.idArea}">
+                                        </option>
+                                    </select>
+                                </div>
+                                <!-- Especialista -->
+                                <div class="col-md-2">
+                                    <label class="form-label text-light small">Especialista</label>
+                                    <select name="idEspecialista" class="form-select form-select-sm form-select-dark">
+                                        <option value="">Todos</option>
+                                        <option th:each="esp : ${especialistas}" th:value="${esp.idUsuario}"
+                                            th:text="${esp.persona.nombres + ' ' + esp.persona.apellidoPaterno}"
+                                            th:selected="${paramEspecialista == esp.idUsuario}"></option>
+                                    </select>
+                                </div>
+                                <!-- Rango Fechas -->
+                                <div class="col-md-2">
+                                    <label class="form-label text-light small">Fecha Desde</label>
+                                    <input type="date" name="fechaDesde"
+                                        class="form-control form-control-sm form-control-dark"
+                                        th:value="${paramFechaDesde != null ? #dates.format(paramFechaDesde, 'yyyy-MM-dd') : ''}">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label text-light small">Fecha Hasta</label>
+                                    <input type="date" name="fechaHasta"
+                                        class="form-control form-control-sm form-control-dark"
+                                        th:value="${paramFechaHasta != null ? #dates.format(paramFechaHasta, 'yyyy-MM-dd') : ''}">
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -55,44 +112,83 @@
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Código Seguimiento</th>
+                                <th>
+                                    <a th:href="@{/expedientes(page=${currentPage}, sortDir=${reverseSortDir}, sortBy='codigoSeguimiento', search=${param.search}, estado=${paramEstado}, idArea=${paramArea}, idEspecialista=${paramEspecialista}, fechaDesde=${paramFechaDesde != null ? #dates.format(paramFechaDesde, 'yyyy-MM-dd') : ''}, fechaHasta=${paramFechaHasta != null ? #dates.format(paramFechaHasta, 'yyyy-MM-dd') : ''})}"
+                                        class="text-white text-decoration-none">
+                                        Código Seguimiento
+                                        <i class="fa fa-sort ms-1"
+                                            th:classappend="${sortBy == 'codigoSeguimiento' ? (sortDir == 'asc' ? 'fa-sort-up text-primary' : 'fa-sort-down text-primary') : ''}"></i>
+                                    </a>
+                                </th>
                                 <th>Solicitante</th>
                                 <th>Tipo</th>
                                 <th>Area Asignada</th>
                                 <th>Especialista Asignado</th>
-                                <th>Estado</th>
-                                <th>Fecha Creación</th>
+                                <th>
+                                    <a th:href="@{/expedientes(page=${currentPage}, sortDir=${reverseSortDir}, sortBy='estadoExpediente', search=${param.search}, estado=${paramEstado}, idArea=${paramArea}, idEspecialista=${paramEspecialista}, fechaDesde=${paramFechaDesde != null ? #dates.format(paramFechaDesde, 'yyyy-MM-dd') : ''}, fechaHasta=${paramFechaHasta != null ? #dates.format(paramFechaHasta, 'yyyy-MM-dd') : ''})}"
+                                        class="text-white text-decoration-none">
+                                        Estado
+                                        <i class="fa fa-sort ms-1"
+                                            th:classappend="${sortBy == 'estadoExpediente' ? (sortDir == 'asc' ? 'fa-sort-up text-primary' : 'fa-sort-down text-primary') : ''}"></i>
+                                    </a>
+                                </th>
+                                <th>
+                                    <a th:href="@{/expedientes(page=${currentPage}, sortDir=${reverseSortDir}, sortBy='prioridad', search=${param.search}, estado=${paramEstado}, idArea=${paramArea}, idEspecialista=${paramEspecialista}, fechaDesde=${paramFechaDesde != null ? #dates.format(paramFechaDesde, 'yyyy-MM-dd') : ''}, fechaHasta=${paramFechaHasta != null ? #dates.format(paramFechaHasta, 'yyyy-MM-dd') : ''})}"
+                                        class="text-white text-decoration-none">
+                                        Prioridad
+                                        <i class="fa fa-sort ms-1"
+                                            th:classappend="${sortBy == 'prioridad' ? (sortDir == 'asc' ? 'fa-sort-up text-primary' : 'fa-sort-down text-primary') : ''}"></i>
+                                    </a>
+                                </th>
+                                <th>
+                                    <a th:href="@{/expedientes(page=${currentPage}, sortDir=${reverseSortDir}, sortBy='fechaCreacion', search=${param.search}, estado=${paramEstado}, idArea=${paramArea}, idEspecialista=${paramEspecialista}, fechaDesde=${paramFechaDesde != null ? #dates.format(paramFechaDesde, 'yyyy-MM-dd') : ''}, fechaHasta=${paramFechaHasta != null ? #dates.format(paramFechaHasta, 'yyyy-MM-dd') : ''})}"
+                                        class="text-white text-decoration-none">
+                                        Fecha Creación
+                                        <i class="fa fa-sort ms-1"
+                                            th:classappend="${sortBy == 'fechaCreacion' ? (sortDir == 'asc' ? 'fa-sort-up text-primary' : 'fa-sort-down text-primary') : ''}"></i>
+                                    </a>
+                                </th>
                                 <th class="text-center">Acciones</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="tablaExpedientesBody" th:fragment="tabla-expedientes">
                             <tr th:each="expediente : ${expedientes}">
                                 <td th:text="${expediente.idExpediente}">1</td>
                                 <td th:text="${expediente.codigoSeguimiento}">EXP-001</td>
-                                <td th:text="${expediente.personaSolicitante.persona.apellidoPaterno + ' ' + expediente.personaSolicitante.persona.apellidoMaterno + ', ' + expediente.personaSolicitante.persona.nombres}">
+                                <td
+                                    th:text="${expediente.personaSolicitante.persona.apellidoPaterno + ' ' + expediente.personaSolicitante.persona.apellidoMaterno + ', ' + expediente.personaSolicitante.persona.nombres}">
                                     Solicitante
                                 </td>
                                 <td>
                                     <span class="badge bg-info"
-                                          th:text="${expediente.tipoExpediente == 'CON' ? 'Conciliación' : 'Patrocinio Legal'}">
+                                        th:text="${expediente.tipoExpediente == 'CON' ? 'Conciliación' : 'Patrocinio Legal'}">
                                         CON
                                     </span>
                                 </td>
                                 <td th:text="'No Asignada'">Legal</td>
-                                <td th:text="${expediente.usuarioAsignado != null ? expediente.usuarioAsignado.persona.apellidoPaterno + ' ' + expediente.usuarioAsignado.persona.apellidoMaterno + ', ' + expediente.usuarioAsignado.persona.nombres : 'Sin Asignar'}">
+                                <td
+                                    th:text="${expediente.usuarioAsignado != null ? expediente.usuarioAsignado.persona.apellidoPaterno + ' ' + expediente.usuarioAsignado.persona.apellidoMaterno + ', ' + expediente.usuarioAsignado.persona.nombres : 'Sin Asignar'}">
                                     Sin Asignar
                                 </td>
                                 <td>
                                     <span class="badge"
-                                          th:classappend="${expediente.estadoExpediente == 'CERR' ? 'bg-primary' :
+                                        th:classappend="${expediente.estadoExpediente == 'CERR' ? 'bg-primary' :
                                                           expediente.estadoExpediente == 'ASIG' ? 'bg-info' :
                                                           expediente.estadoExpediente == 'EN_ATE' ? 'bg-success' :
                                                           expediente.estadoExpediente == 'ANUL' ? 'bg-warning' : 'bg-secondary'}"
-                                          th:text="${expediente.estadoExpediente == 'CERR' ? 'Cerrado' :
+                                        th:text="${expediente.estadoExpediente == 'CERR' ? 'Cerrado' :
                                                           expediente.estadoExpediente == 'ASIG' ? 'Asignado' :
                                                           expediente.estadoExpediente == 'EN_ATE' ? 'En Atención' :
                                                           expediente.estadoExpediente == 'ANUL' ? 'Anulado' : 'Sin Asignar'}">
                                         Activo
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge"
+                                        th:classappend="${expediente.prioridad == 'Alta' ? 'bg-danger' :
+                                                          expediente.prioridad == 'Media' ? 'bg-warning text-dark' : 'bg-success'}"
+                                        th:text="${expediente.prioridad != null ? expediente.prioridad : 'Media'}">
+                                        Media
                                     </span>
                                 </td>
                                 <td th:text="${#dates.format(expediente.fechaCreacion, 'dd/MM/yyyy HH:mm')}">
@@ -101,20 +197,44 @@
                                 <td class="text-center">
                                     <div class="btn-group" role="group">
                                         <a th:href="@{/expedientes/editar/{id}(id=${expediente.idExpediente})}"
-                                           class="btn btn-sm btn-outline-warning"
-                                           title="Editar">
+                                            class="btn btn-sm btn-outline-warning" title="Editar">
                                             <i class="fa fa-pencil"></i>
                                         </a>
-                                        <a th:href="@{/expedientes/exportar/{id}(id=${expediente.idExpediente})}"
-                                           class="btn btn-sm btn-outline-success"
-                                           title="Exportar PDF">
+                                        <button type="button" class="btn btn-sm btn-outline-info btn-cambiar-estado"
+                                            th:data-id="${expediente.idExpediente}"
+                                            th:data-estado="${expediente.estadoExpediente}"
+                                            th:data-especialista="${expediente.usuarioAsignado != null ? expediente.usuarioAsignado.idUsuario : ''}"
+                                            th:if="${expediente.estadoExpediente != 'CERR'}"
+                                            title="Cambiar Estado / Asignar">
+                                            <i class="fa fa-exchange-alt"></i>
+                                        </button>
+                                        <button type="button"
+                                            class="btn btn-sm btn-outline-primary btn-derivar-expediente"
+                                            th:data-id="${expediente.idExpediente}"
+                                            th:data-asignado="${expediente.usuarioAsignado != null ? expediente.usuarioAsignado.idUsuario : ''}"
+                                            th:if="${expediente.estadoExpediente != 'CERR'}" title="Derivar a Abogado">
+                                            <i class="fa fa-share"></i>
+                                        </button>
+                                        <button type="button"
+                                            class="btn btn-sm btn-outline-danger btn-cerrar-expediente"
+                                            th:data-id="${expediente.idExpediente}"
+                                            th:if="${expediente.estadoExpediente != 'CERR'}" title="Cerrar Expediente">
+                                            <i class="fa fa-lock"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-light btn-ver-historial"
+                                            th:data-id="${expediente.idExpediente}" title="Ver Historial">
+                                            <i class="fa fa-history"></i>
+                                        </button>
+                                        <a th:href="@{/expedientes/{id}/cargo/pdf(id=${expediente.idExpediente})}"
+                                            class="btn btn-sm btn-outline-success" title="Descargar Cargo PDF"
+                                            target="_blank">
                                             <i class="fa fa-file-pdf"></i>
                                         </a>
                                     </div>
                                 </td>
                             </tr>
                             <tr th:if="${expedientes.empty}">
-                                <td colspan="9" class="text-center text-muted py-4">
+                                <td colspan="10" class="text-center text-muted py-4">
                                     <i class="fa fa-inbox fa-3x mb-3 d-block"></i>
                                     No hay expedientes registrados
                                     <span th:if="${param.search}">
@@ -133,24 +253,23 @@
             <ul class="pagination pagination-dark">
                 <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
                     <a class="page-link"
-                       th:href="@{/expedientes(page=${currentPage - 1}, search=${param.search})}"
-                       aria-label="Anterior">
+                        th:href="@{/expedientes(page=${currentPage - 1}, search=${param.search}, estado=${paramEstado}, idArea=${paramArea}, idEspecialista=${paramEspecialista}, fechaDesde=${paramFechaDesde != null ? #dates.format(paramFechaDesde, 'yyyy-MM-dd') : ''}, fechaHasta=${paramFechaHasta != null ? #dates.format(paramFechaHasta, 'yyyy-MM-dd') : ''}, sortBy=${sortBy}, sortDir=${sortDir})}"
+                        aria-label="Anterior">
                         <span aria-hidden="true">&laquo; Anterior</span>
                     </a>
                 </li>
 
-                <li class="page-item"
-                    th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
                     th:classappend="${i == currentPage} ? 'active'">
                     <a class="page-link"
-                       th:href="@{/expedientes(page=${i}, search=${param.search})}"
-                       th:text="${i + 1}">1</a>
+                        th:href="@{/expedientes(page=${i}, search=${param.search}, estado=${paramEstado}, idArea=${paramArea}, idEspecialista=${paramEspecialista}, fechaDesde=${paramFechaDesde != null ? #dates.format(paramFechaDesde, 'yyyy-MM-dd') : ''}, fechaHasta=${paramFechaHasta != null ? #dates.format(paramFechaHasta, 'yyyy-MM-dd') : ''}, sortBy=${sortBy}, sortDir=${sortDir})}"
+                        th:text="${i + 1}">1</a>
                 </li>
 
                 <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
                     <a class="page-link"
-                       th:href="@{/expedientes(page=${currentPage + 1}, search=${param.search})}"
-                       aria-label="Siguiente">
+                        th:href="@{/expedientes(page=${currentPage + 1}, search=${param.search}, estado=${paramEstado}, idArea=${paramArea}, idEspecialista=${paramEspecialista}, fechaDesde=${paramFechaDesde != null ? #dates.format(paramFechaDesde, 'yyyy-MM-dd') : ''}, fechaHasta=${paramFechaHasta != null ? #dates.format(paramFechaHasta, 'yyyy-MM-dd') : ''}, sortBy=${sortBy}, sortDir=${sortDir})}"
+                        aria-label="Siguiente">
                         <span aria-hidden="true">Siguiente &raquo;</span>
                     </a>
                 </li>
@@ -159,9 +278,259 @@
 
         <!-- Información de paginación -->
         <div class="text-center text-muted small mt-2" th:if="${!expedientes.empty}">
-            Mostrando página <strong th:text="${currentPage + 1}">1</strong> de <strong th:text="${totalPages}">1</strong>
+            Mostrando página <strong th:text="${currentPage + 1}">1</strong> de <strong
+                th:text="${totalPages}">1</strong>
             (<strong th:text="${expedientes.size()}">0</strong> expedientes en esta página)
         </div>
+        <!-- Modal: Cambiar Estado -->
+        <div class="modal fade" id="modalCambiarEstado" tabindex="-1" aria-labelledby="modalCambiarEstadoLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered border-secondary text-light">
+                <div class="modal-content bg-dark">
+                    <div class="modal-header border-secondary">
+                        <h5 class="modal-title" id="modalCambiarEstadoLabel"><i class="fa fa-exchange-alt me-2"></i>
+                            Cambiar
+                            Estado</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="formCambiarEstado">
+                            <input type="hidden" id="cmbEstadoExpedienteId" name="expedienteId">
+
+                            <div class="mb-3">
+                                <label class="form-label text-warning small">Nuevo Estado</label>
+                                <select class="form-select form-select-dark bg-dark text-light border-secondary"
+                                    id="cmbNuevoEstado" name="estado" required>
+                                    <option value="SIN_ASIG">Sin Asignar</option>
+                                    <option value="ASIG">Asignado</option>
+                                    <option value="EN_ATE">En Atención</option>
+                                    <option value="CERR">Cerrado</option>
+                                    <option value="ANUL">Anulado</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label text-warning small">Especialista Asignado (Opcional)</label>
+                                <select class="form-select form-select-dark bg-dark text-light border-secondary"
+                                    id="cmbNuevoEspecialista" name="idEspecialista">
+                                    <option value="">-- Sin Asignar --</option>
+                                    <option th:each="esp : ${especialistas}" th:value="${esp.idUsuario}"
+                                        th:text="${esp.persona.nombres + ' ' + esp.persona.apellidoPaterno}"></option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label text-warning small">Observaciones / Motivo</label>
+                                <textarea class="form-control bg-dark text-light border-secondary" id="txtObservaciones"
+                                    name="observaciones" rows="3"
+                                    placeholder="Detalle los motivos del cambio"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer border-secondary">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary" id="btnGuardarCambioEstado">Guardar
+                            Cambios</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Ver Historial -->
+        <div class="modal fade" id="modalVerHistorial" tabindex="-1" aria-labelledby="modalVerHistorialLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg border-secondary text-light">
+                <div class="modal-content bg-dark">
+                    <div class="modal-header border-secondary">
+                        <h5 class="modal-title" id="modalVerHistorialLabel"><i class="fa fa-history me-2"></i> Historial
+                            del
+                            Expediente</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <!-- El body del modal se carga dinámicamente con fragmento -->
+                    <div class="modal-body p-4" id="contenedorHistorial">
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                            <p class="mt-2 text-muted">Cargando línea de tiempo...</p>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-secondary">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Derivar Expediente -->
+        <div class="modal fade" id="modalDerivarExpediente" tabindex="-1" aria-labelledby="modalDerivarExpedienteLabel"
+            aria-hidden="true">
+            <div class="modal-dialog border-secondary text-light">
+                <div class="modal-content bg-dark">
+                    <div class="modal-header border-secondary">
+                        <h5 class="modal-title text-primary" id="modalDerivarExpedienteLabel">
+                            <i class="fa fa-share me-2"></i> Derivar Expediente
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-info text-dark">
+                            <i class="fa fa-info-circle me-2"></i>
+                            Seleccione el abogado responsable y agregue un comentario de derivación.
+                        </div>
+                        <form id="formDerivarExpediente">
+                            <input type="hidden" id="derivarExpedienteId" name="expedienteId">
+                            <div class="mb-3">
+                                <label class="form-label text-warning small">Abogado / Especialista Destino <span
+                                        class="text-danger">*</span></label>
+                                <select class="form-select form-select-dark bg-dark text-light border-secondary"
+                                    id="cmbAbogadoDerivacion" name="idAbogado" required>
+                                    <option value="">-- Seleccione un abogado --</option>
+                                    <option th:each="esp : ${especialistas}" th:value="${esp.idUsuario}"
+                                        th:text="${esp.persona.nombres + ' ' + esp.persona.apellidoPaterno}"></option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-warning small">Comentario de Derivación <span
+                                        class="text-danger">*</span></label>
+                                <textarea class="form-control bg-dark text-light border-secondary"
+                                    id="txtComentarioDerivacion" name="comentario" rows="3" required
+                                    placeholder="Indique el motivo o instrucción de derivación..."></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer border-secondary">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary" id="btnConfirmarDerivacion">
+                            <i class="fa fa-share me-1"></i> Confirmar Derivación
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Cerrar Expediente -->
+        <div class="modal fade" id="modalCerrarExpediente" tabindex="-1" aria-labelledby="modalCerrarExpedienteLabel"
+            aria-hidden="true">
+            <div class="modal-dialog border-secondary text-light">
+                <div class="modal-content bg-dark">
+                    <div class="modal-header border-secondary">
+                        <h5 class="modal-title text-danger" id="modalCerrarExpedienteLabel">
+                            <i class="fa fa-lock me-2"></i> Cerrar Expediente
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-warning text-dark">
+                            <i class="fa fa-exclamation-triangle me-2"></i>
+                            <strong>Atención:</strong> Al cerrar el expediente, se enviará una notificación al
+                            solicitante y el registro pasará a ser de solo lectura. Esta acción no se puede deshacer.
+                        </div>
+                        <form id="formCerrarExpediente">
+                            <input type="hidden" id="cerrarExpedienteId" name="expedienteId">
+                            <div class="mb-3">
+                                <label class="form-label text-warning small">Motivo o Resolución de Cierre <span
+                                        class="text-danger">*</span></label>
+                                <textarea class="form-control bg-dark text-light border-secondary" id="txtMotivoCierre"
+                                    name="motivoCierre" rows="4" required
+                                    placeholder="Indique el motivo por el cual se cierra este expediente..."></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer border-secondary">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-danger" id="btnConfirmarCierre">Cerrar Expediente</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Template Fragment for Historial Timeline -->
+        <div th:fragment="timeline-historial" th:if="${movimientos != null}" class="timeline-container">
+            <style>
+                .timeline {
+                    border-left: 2px solid #5a5c69;
+                    margin-left: 20px;
+                    padding-left: 20px;
+                    position: relative;
+                }
+
+                .timeline-item {
+                    position: relative;
+                    margin-bottom: 1.5rem;
+                }
+
+                .timeline-item::before {
+                    content: '';
+                    position: absolute;
+                    left: -27px;
+                    top: 0;
+                    width: 12px;
+                    height: 12px;
+                    border-radius: 50%;
+                    background-color: #4e73df;
+                    border: 2px solid #2b2e35;
+                }
+
+                .timeline-date {
+                    font-size: 0.85rem;
+                    color: #858796;
+                    margin-bottom: 0.25rem;
+                }
+
+                .timeline-content {
+                    background-color: #343a40;
+                    padding: 10px 15px;
+                    border-radius: 5px;
+                    border: 1px solid #454d55;
+                }
+            </style>
+
+            <div th:if="${movimientos.empty}" class="text-center text-muted p-4">
+                <i class="fa fa-info-circle fa-2x mb-2 d-block"></i>
+                No se encontraron movimientos registrados para este expediente.
+            </div>
+
+            <div th:unless="${movimientos.empty}" class="timeline">
+                <div class="timeline-item" th:each="mov : ${movimientos}">
+                    <div class="timeline-date">
+                        <i class="fa fa-calendar-alt me-1"></i> <span
+                            th:text="${#dates.format(mov.fechaCreacion, 'dd/MM/yyyy HH:mm:ss')}"></span>
+                        <span class="ms-2 badge bg-primary" th:text="${mov.accion}">ACCION</span>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="mb-1 text-info small">
+                            <i class="fa fa-user me-1"></i> Autor: <strong
+                                th:text="${mov.usuarioActor.persona.nombres + ' ' + mov.usuarioActor.persona.apellidoPaterno}"></strong>
+                        </div>
+                        <div th:if="${mov.estadoNuevo != mov.estadoAnterior}">
+                            Estado: <span class="badge bg-secondary" th:text="${mov.estadoAnterior}">ANT</span> <i
+                                class="fa fa-arrow-right mx-1 text-muted"></i> <span class="badge bg-success"
+                                th:text="${mov.estadoNuevo}">NUE</span>
+                        </div>
+                        <div th:if="${mov.usuarioAsignadoNuevo != mov.usuarioAsignadoAnterior}" class="mt-1">
+                            Especialista: <span class="badge bg-dark border border-secondary text-light"
+                                th:text="${mov.usuarioAsignadoAnterior != null ? mov.usuarioAsignadoAnterior.persona.nombres : 'Ninguno'}"></span>
+                            <i class="fa fa-arrow-right mx-1 text-muted"></i> <span class="badge bg-info text-dark"
+                                th:text="${mov.usuarioAsignadoNuevo != null ? mov.usuarioAsignadoNuevo.persona.nombres : 'Ninguno'}"></span>
+                        </div>
+                        <div class="mt-2 text-light" th:if="${mov.detalles != null and !mov.detalles.empty}">
+                            <i class="fa fa-comment-dots text-muted me-1"></i> <span th:text="${mov.detalles}"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <th:block layout:fragment="scripts">
+        <script th:src="@{/js/expedientes.js}"></script>
+    </th:block>
 </body>
+
 </html>

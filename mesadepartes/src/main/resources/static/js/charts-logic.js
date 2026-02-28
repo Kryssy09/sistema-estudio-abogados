@@ -86,57 +86,68 @@ function initializeCharts() {
     /*
     const reportChart = document.getElementById('reportChart');
     if (reportChart) {
-        new Chart(reportChart.getContext('2d'), {
-            type: 'line',
-            data: {
-                labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'],
-                datasets: [{
-                    label: 'Conciliación',
-                    data: [12, 19, 15, 25, 22, 30],
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.1)',
-                    tension: 0.4
-                }, {
-                    label: 'Patrocinio Legal',
-                    data: [8, 12, 10, 14, 18, 16],
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.1)',
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: 'rgba(255, 255, 255, 0.1)'
-                        },
-                        ticks: {
-                            color: 'rgba(255, 255, 255, 0.7)'
-                        }
-                    },
-                    x: {
-                        grid: {
-                            color: 'rgba(255, 255, 255, 0.1)'
-                        },
-                        ticks: {
-                            color: 'rgba(255, 255, 255, 0.7)'
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: 'rgba(255, 255, 255, 0.7)'
-                        }
-                    }
-                }
-            }
-        });
+    ...
     }
     */
+}
+
+let resumenChartInstance = null;
+
+function cargarGráficoResumenFechas(fechaInicio, fechaFin) {
+    const reportChart = document.getElementById('reportChart');
+    if (!reportChart) return;
+
+    let url = '/reportes/estadisticas/resumen';
+    if (fechaInicio && fechaFin) {
+        url += `?fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`;
+    }
+
+    fetch(url)
+        .then(res => res.ok ? res.json() : Promise.reject('Error fetching resumen data'))
+        .then(resumen => {
+            const labels = Object.keys(resumen);
+            const data = Object.values(resumen);
+
+            if (resumenChartInstance) {
+                resumenChartInstance.destroy();
+            }
+
+            resumenChartInstance = new Chart(reportChart.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Cantidad de Expedientes',
+                        data: data,
+                        backgroundColor: [
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(40, 167, 69, 0.6)',
+                            'rgba(255, 193, 7, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(40, 167, 69, 1)',
+                            'rgba(255, 193, 7, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, ticks: { color: 'rgba(255,255,255,0.7)', stepSize: 1 } },
+                        x: { ticks: { color: 'rgba(255,255,255,0.7)' } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        })
+        .catch(err => {
+            console.error(err);
+            if (resumenChartInstance) resumenChartInstance.destroy();
+            resumenChartInstance = new Chart(reportChart.getContext('2d'), { type: 'bar', data: { labels: [], datasets: [] } });
+        });
 }
 
 // Función utilitaria para mostrar notificaciones toast

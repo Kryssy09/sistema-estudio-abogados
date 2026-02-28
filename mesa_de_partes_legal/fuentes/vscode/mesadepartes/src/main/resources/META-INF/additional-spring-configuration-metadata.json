@@ -1,5 +1,0 @@
-{
-  "properties": [
-    { "name": "app.storage.root", "type": "java.lang.String", "description": "Directorio raíz para archivos subidos." }
-  ]
-}

@@ -194,9 +194,11 @@
                 console.log('Generando reporte por fechas:', { fechaInicio, fechaFin, tipoReporte });
                 showToast('Generando reporte del ' + fechaInicio + ' al ' + fechaFin, 'info');
 
-                // Por ahora genera el reporte normal
-                // Puedes implementar filtrado por fechas después
-                generarReporte(tipoReporte);
+                let url = `/reportes/pdf/${tipoReporte}?fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`;
+                window.location.href = url;
+
+                // Refresh summary chart
+                cargarGráficoResumenFechas(fechaInicio, fechaFin);
 
                 // Cerrar modal
                 const modal = bootstrap.Modal.getInstance(document.getElementById('fechasModal'));
@@ -206,6 +208,7 @@
             document.addEventListener('DOMContentLoaded', function () {
                 // Inicializar gráfico
                 initializeCharts();
+                cargarGráficoResumenFechas(null, null);
             });
         </script>
     </th:block>

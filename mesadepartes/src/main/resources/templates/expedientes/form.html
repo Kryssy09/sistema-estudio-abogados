@@ -22,6 +22,84 @@
                 </h5>
             </div>
             <div class="card-body">
+                <div th:if="${isEdit and expediente.estadoExpediente == 'CERR'}" class="alert alert-warning">
+                    <i class="fa fa-exclamation-triangle me-2"></i> Este expediente se encuentra
+                    <strong>Cerrado</strong> y es de solo lectura.
+                    <hr>
+                    <strong>Motivo de Cierre:</strong> <span th:text="${expediente.motivoCierre}"></span>
+                </div>
+
+                <!-- Cargo de Recepción -->
+                <div th:if="${isEdit}" class="alert alert-info d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="fa fa-file-pdf me-2"></i>
+                        <strong>Cargo de Recepción:</strong>
+                        <span
+                            th:if="${expediente.rutaCargoRecepcion != null and !#strings.isEmpty(expediente.rutaCargoRecepcion)}">
+                            Generado automáticamente al crear el expediente.
+                        </span>
+                        <span
+                            th:unless="${expediente.rutaCargoRecepcion != null and !#strings.isEmpty(expediente.rutaCargoRecepcion)}">
+                            No disponible.
+                        </span>
+                    </div>
+                    <a th:href="@{/expedientes/{id}/cargo/pdf(id=${expediente.idExpediente})}"
+                        class="btn btn-success btn-sm" target="_blank" title="Descargar el Cargo de Recepción en PDF">
+                        <i class="fa fa-download me-1"></i> Descargar PDF
+                    </a>
+                </div>
+
+                <!-- ── Panel: Asignar / Derivar Abogado Responsable ── -->
+                <div th:if="${isEdit and expediente.estadoExpediente != 'CERR'}" class="card border-primary mb-3">
+                    <div class="card-header bg-primary text-white py-2">
+                        <i class="fa fa-user-tie me-2"></i>
+                        <strong>Asignar / Derivar Abogado Responsable</strong>
+                    </div>
+                    <div class="card-body">
+                        <!-- Abogado actual -->
+                        <div class="mb-3" th:if="${expediente.usuarioAsignado != null}">
+                            <span class="badge bg-success fs-6 py-2 px-3">
+                                <i class="fa fa-check-circle me-1"></i>
+                                Actualmente asignado:
+                                <strong th:text="${expediente.usuarioAsignado.persona.nombres
+                                    + ' ' + expediente.usuarioAsignado.persona.apellidoPaterno}"></strong>
+                            </span>
+                        </div>
+                        <div class="mb-3" th:unless="${expediente.usuarioAsignado != null}">
+                            <span class="badge bg-secondary fs-6 py-2 px-3">
+                                <i class="fa fa-user-slash me-1"></i> Sin abogado asignado
+                            </span>
+                        </div>
+
+                        <!-- Formulario de asignación — fuera del form principal -->
+                        <form th:action="@{/expedientes/{id}/asignar(id=${expediente.idExpediente})}" method="post"
+                            class="row g-3">
+                            <div class="col-md-5">
+                                <label class="form-label"><i class="fa fa-user-tie me-1"></i> Abogado / Especialista
+                                    <span class="text-danger">*</span></label>
+                                <select class="form-select" name="idAbogado" required>
+                                    <option value="">-- Seleccione un abogado --</option>
+                                    <option th:each="ab : ${abogados}" th:value="${ab.idUsuario}"
+                                        th:text="${ab.persona.nombres + ' ' + ab.persona.apellidoPaterno}" th:selected="${expediente.usuarioAsignado != null
+                                                and expediente.usuarioAsignado.idUsuario == ab.idUsuario}">
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-5">
+                                <label class="form-label"><i class="fa fa-comment me-1"></i> Comentario
+                                    (opcional)</label>
+                                <input type="text" class="form-control" name="comentario"
+                                    placeholder="Ej: Caso urgente, asignar inmediatamente">
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fa fa-share me-1"></i> Asignar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
                 <form th:action="${isEdit ? '/expedientes/editar/' + expediente.idExpediente : '/expedientes/crear'}"
                     method="post" th:object="${form}" enctype="multipart/form-data">
 
@@ -56,12 +134,14 @@
                             <div class="d-flex gap-4">
                                 <div class="form-check">
                                     <input class="form-check-input" type="radio" name="tipoExpediente" value="CON"
-                                        th:checked="${isEdit ? (expediente.tipoExpediente=='CON') : true}" id="tCON">
+                                        th:checked="${isEdit ? (expediente.tipoExpediente=='CON') : true}" id="tCON"
+                                        th:disabled="${isEdit and expediente.estadoExpediente == 'CERR'}">
                                     <label class="form-check-label" for="tCON">Conciliación</label>
                                 </div>
                                 <div class="form-check">
                                     <input class="form-check-input" type="radio" name="tipoExpediente" value="PL"
-                                        th:checked="${isEdit ? (expediente.tipoExpediente=='PL') : false}" id="tPL">
+                                        th:checked="${isEdit ? (expediente.tipoExpediente=='PL') : false}" id="tPL"
+                                        th:disabled="${isEdit and expediente.estadoExpediente == 'CERR'}">
                                     <label class="form-check-label" for="tPL">Patrocinio Legal</label>
                                 </div>
                             </div>
@@ -73,12 +153,14 @@
                             <div class="d-flex gap-4">
                                 <div class="form-check">
                                     <input class="form-check-input" type="radio" name="mutuoAcuerdo" value="true"
-                                        th:checked="${isEdit ? (expediente.mutuoAcuerdo==true) : true}" id="maSi">
+                                        th:checked="${isEdit ? (expediente.mutuoAcuerdo==true) : true}" id="maSi"
+                                        th:disabled="${isEdit and expediente.estadoExpediente == 'CERR'}">
                                     <label class="form-check-label" for="maSi">Sí</label>
                                 </div>
                                 <div class="form-check">
                                     <input class="form-check-input" type="radio" name="mutuoAcuerdo" value="false"
-                                        th:checked="${isEdit ? (expediente.mutuoAcuerdo==false) : false}" id="maNo">
+                                        th:checked="${isEdit ? (expediente.mutuoAcuerdo==false) : false}" id="maNo"
+                                        th:disabled="${isEdit and expediente.estadoExpediente == 'CERR'}">
                                     <label class="form-check-label" for="maNo">No</label>
                                 </div>
                             </div>
@@ -138,7 +220,8 @@
                                 </a>
                             </div>
                             <div th:if="${!isEdit}">
-                                <input type="file" class="form-control" name="formatoArchivo" accept=".pdf,.doc">
+                                <input type="file" class="form-control" name="formatoArchivo" accept=".pdf,.doc"
+                                    th:disabled="${isEdit and expediente.estadoExpediente == 'CERR'}">
                                 <div class="form-text">Formatos permitidos: PDF, DOC/DOCX</div>
                             </div>
                         </div>
@@ -147,7 +230,8 @@
                         <div class="col-12">
                             <label class="form-label">Reseña de la Solicitud <span class="text-danger">*</span></label>
                             <textarea class="form-control" name="reseniaSolicitud" rows="4" required
-                                th:text="${isEdit ? expediente.reseniaSolicitud : ''}" th:readonly="${isEdit}"
+                                th:text="${isEdit ? expediente.reseniaSolicitud : ''}"
+                                th:readonly="${isEdit and expediente.estadoExpediente == 'CERR'}"
                                 placeholder="Describa brevemente la solicitud..."></textarea>
                         </div>
                     </div>
@@ -161,7 +245,8 @@
                                 Sesiones del Expediente
                             </h5>
                             <a th:href="@{/expedientes/{id}/sesiones/nueva(id=${expediente.idExpediente})}"
-                                class="btn btn-sm btn-light">
+                                class="btn btn-sm btn-light"
+                                th:if="${!(isEdit and expediente.estadoExpediente == 'CERR')}">
                                 <i class="fa fa-plus me-1"></i> Nueva Sesión
                             </a>
                         </div>
@@ -191,11 +276,13 @@
                                                     <i class="fa fa-eye"></i>
                                                 </button>
                                                 <a th:href="@{/expedientes/sesiones/{id}/editar(id=${sesion.idExpedienteSesion})}"
-                                                    class="btn btn-sm btn-primary">
+                                                    class="btn btn-sm btn-primary"
+                                                    th:if="${!(isEdit and expediente.estadoExpediente == 'CERR')}">
                                                     <i class="fa fa-edit"></i>
                                                 </a>
                                                 <button type="button" class="btn btn-sm btn-danger"
                                                     th:data-id="${sesion.idExpedienteSesion}"
+                                                    th:if="${!(isEdit and expediente.estadoExpediente == 'CERR')}"
                                                     onclick="deleteSesion(this)">
                                                     <i class="fa fa-trash"></i>
                                                 </button>
@@ -212,7 +299,8 @@
                         <a th:href="@{/expedientes}" class="btn btn-outline-secondary">
                             <i class="fa fa-times me-1"></i> Cancelar
                         </a>
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-primary"
+                            th:if="${!(isEdit and expediente.estadoExpediente == 'CERR')}">
                             <i class="fa fa-save me-1"></i>
                             <span th:text="${isEdit ? 'Actualizar' : 'Crear'}">Guardar</span>
                         </button>
